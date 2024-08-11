@@ -1,11 +1,9 @@
-import { Add } from "@mui/icons-material";
-import { Box, Grid, IconButton } from "@mui/material";
+import { Box, Grid } from "@mui/material";
 import AppBar from "@mui/material/AppBar";
 import Container from "@mui/material/Container";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 
-import { ShapePreview } from "./ShapePreview";
 import { PiecesManager } from "./PiecesManager";
 
 // import "./App.css";
