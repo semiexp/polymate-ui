@@ -86,7 +86,7 @@ export const PiecesManager = () => {
               </Button>
             </Grid>
           ))}
-        </Grid>{" "}
+        </Grid>
       </Box>
     </Box>
   );
