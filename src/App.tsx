@@ -5,6 +5,9 @@ import Container from "@mui/material/Container";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 
+import { ShapePreview } from "./ShapePreview";
+import { PiecesManager } from "./PiecesManager";
+
 // import "./App.css";
 
 function App() {
@@ -25,37 +28,7 @@ function App() {
 
       <Grid container spacing={0}>
         <Grid item xs={6}>
-          <Box
-            sx={{
-              border: 2,
-              borderColor: "#999999",
-              margin: 1,
-              borderRadius: 2,
-              overflow: "hidden",
-            }}
-          >
-            <Toolbar variant="dense" sx={{ backgroundColor: "#ffdddd" }}>
-              <Typography
-                variant="h6"
-                color="inherit"
-                component="div"
-                sx={{ flexGlow: 1 }}
-              >
-                Pieces
-              </Typography>
-              <IconButton
-                size="small"
-                edge="start"
-                color="inherit"
-                sx={{ marginLeft: "auto" }}
-              >
-                <Add />
-              </IconButton>
-            </Toolbar>
-            <Box sx={{ overflowY: "scroll", height: "320px" }}>
-              <Typography>Lorem ipsum</Typography>
-            </Box>
-          </Box>
+          <PiecesManager />
         </Grid>
         <Grid item xs={6}>
           <Box
