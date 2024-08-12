@@ -5,7 +5,7 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 
 import { PiecesManager } from "./PiecesManager";
-
+import { ShapeEditor } from "./ShapeEditor";
 // import "./App.css";
 
 function App() {
@@ -44,7 +44,7 @@ function App() {
               </Typography>
             </Toolbar>
             <Box sx={{ height: "320px" }}>
-              <Typography>Lorem ipsum</Typography>
+              <ShapeEditor />
             </Box>
           </Box>
         </Grid>
