@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import { Box, Grid } from "@mui/material";
 import AppBar from "@mui/material/AppBar";
 import Container from "@mui/material/Container";
@@ -9,6 +11,8 @@ import { ShapeEditor } from "./ShapeEditor";
 // import "./App.css";
 
 function App() {
+  const [board, setBoard] = useState<number[][][]>([[[0]]]);
+
   return (
     <Container maxWidth="md">
       <AppBar position="sticky">
@@ -44,7 +48,11 @@ function App() {
               </Typography>
             </Toolbar>
             <Box sx={{ height: "320px" }}>
-              <ShapeEditor />
+              <ShapeEditor
+                shape={board}
+                onChange={(shape) => setBoard(shape)}
+                planarGridSize={32}
+              />
             </Box>
           </Box>
         </Grid>

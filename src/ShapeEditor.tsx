@@ -99,8 +99,8 @@ const PlanarShapeEditor = (props: PlanarShapeEditorProps) => {
     const shapeHeight = shape.length;
     const shapeWidth = shape[0].length;
 
-    let gridXPos = dx + (gridSize + width) * 0.5;
-    let gridXMin = gridXPos - Math.floor(gridXPos / gridSize) * gridSize;
+    const gridXPos = dx + (gridSize + width) * 0.5;
+    const gridXMin = gridXPos - Math.floor(gridXPos / gridSize) * gridSize;
     for (let n = 0; n <= Math.floor(width / gridSize); ++n) {
       svgItems.push(
         <line
@@ -114,8 +114,8 @@ const PlanarShapeEditor = (props: PlanarShapeEditorProps) => {
       );
     }
 
-    let gridYPos = dy + (gridSize + height) * 0.5;
-    let gridYMin = gridYPos - Math.floor(gridYPos / gridSize) * gridSize;
+    const gridYPos = dy + (gridSize + height) * 0.5;
+    const gridYMin = gridYPos - Math.floor(gridYPos / gridSize) * gridSize;
     for (let n = 0; n <= Math.floor(height / gridSize); ++n) {
       svgItems.push(
         <line
@@ -209,7 +209,7 @@ const PlanarShapeEditor = (props: PlanarShapeEditorProps) => {
     }
   };
 
-  const onMouseUp = (_e: React.MouseEvent) => {
+  const onMouseUp = () => {
     setDragging(false);
     setUpdateValue(null);
   };
@@ -246,9 +246,9 @@ type ShapeEditorProps = {
   planarGridSize: number;
 };
 
-export const ShapeEditor = () => {
+export const ShapeEditor = (props: ShapeEditorProps) => {
   const [tabValue, setTabValue] = useState(0);
-  const [shape, setShape] = useState<number[][][]>([[[1]]]);
+  const { shape, onChange } = props;
 
   return (
     <Box
@@ -278,7 +278,7 @@ export const ShapeEditor = () => {
         <PlanarShapeEditor
           shape={shape[0]}
           onChange={(s) => {
-            setShape([s]);
+            onChange([s]);
           }}
           gridSize={32}
         />
