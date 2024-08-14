@@ -8,10 +8,12 @@ import Typography from "@mui/material/Typography";
 
 import { PiecesManager } from "./PiecesManager";
 import { ShapeEditor } from "./ShapeEditor";
+import { SolverPanel } from "./SolverPanel";
 // import "./App.css";
 
 function App() {
   const [board, setBoard] = useState<number[][][]>([[[0]]]);
+  const [pieces, setPieces] = useState<number[][][][]>([[[[1]]]]);
 
   return (
     <Container maxWidth="md">
@@ -30,7 +32,10 @@ function App() {
 
       <Grid container spacing={0}>
         <Grid item xs={6}>
-          <PiecesManager />
+          <PiecesManager
+            pieces={pieces}
+            onChange={(pieces) => setPieces(pieces)}
+          />
         </Grid>
         <Grid item xs={6}>
           <Box
@@ -57,24 +62,7 @@ function App() {
           </Box>
         </Grid>
         <Grid item xs={12}>
-          <Box
-            sx={{
-              border: 2,
-              borderColor: "#999999",
-              margin: 1,
-              borderRadius: 2,
-              overflow: "hidden",
-            }}
-          >
-            <Toolbar variant="dense" sx={{ backgroundColor: "#ddffff" }}>
-              <Typography variant="h6" color="inherit" component="div">
-                Solver
-              </Typography>
-            </Toolbar>
-            <Box sx={{ height: "320px" }}>
-              <Typography>Lorem ipsum</Typography>
-            </Box>
-          </Box>
+          <SolverPanel pieces={pieces} board={board} />
         </Grid>
       </Grid>
     </Container>

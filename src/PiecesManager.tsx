@@ -30,32 +30,36 @@ const isEmpty = (shape: number[][][]): boolean => {
   return true;
 };
 
-export const PiecesManager = () => {
+export type PiecesManagerProps = {
+  pieces: number[][][][];
+  onChange: (pieces: number[][][][]) => void;
+};
+
+export const PiecesManager = (props: PiecesManagerProps) => {
   const pieceEditorDialogRef = useRef<PieceEditorDialogRefType>(null);
 
-  const initialShapes = [[[[1]]]];
-  const [shapes, setShapes] = useState<number[][][][]>(initialShapes);
+  const { pieces, onChange } = props;
 
   const onEditPiece = async (index: number) => {
-    const newShape = await pieceEditorDialogRef.current!.open(shapes[index]);
+    const newShape = await pieceEditorDialogRef.current!.open(pieces[index]);
     if (newShape) {
       const newShapes = [];
-      for (let i = 0; i < shapes.length; ++i) {
-        newShapes.push(i === index ? newShape : shapes[i]);
+      for (let i = 0; i < pieces.length; ++i) {
+        newShapes.push(i === index ? newShape : pieces[i]);
       }
-      setShapes(newShapes);
+      onChange(newShapes);
     }
   };
 
   const onAddPiece = async () => {
     const newShape = await pieceEditorDialogRef.current!.open([[[0]]]);
     if (newShape) {
-      setShapes([...shapes, newShape]);
+      onChange([...pieces, newShape]);
     }
   };
 
   const onRemovePiece = (index: number) => {
-    setShapes(shapes.filter((_shape, i) => i !== index));
+    onChange(pieces.filter((_piece, i) => i !== index));
   };
 
   return (
@@ -89,7 +93,7 @@ export const PiecesManager = () => {
       </Toolbar>
       <Box sx={{ overflowY: "scroll", height: "320px" }}>
         <Grid container spacing={0}>
-          {shapes.map((shape, index) => (
+          {pieces.map((shape, index) => (
             <Grid item xs="auto" key={index}>
               <Button
                 sx={{ border: 1, borderColor: "#aaaaaa", margin: 0.5 }}
