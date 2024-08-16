@@ -85,6 +85,7 @@ export const SolverPanel = (props: SolverPanelProps) => {
     const answers = solve(problem);
 
     setAnswerState({ answers, board });
+    setIndex(0);
   };
 
   const actualIndex =

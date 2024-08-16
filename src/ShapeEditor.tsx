@@ -232,6 +232,7 @@ const PlanarShapeEditor = (props: PlanarShapeEditorProps) => {
         onMouseDown={onMouseDown}
         onMouseMove={onMouseMove}
         onMouseUp={onMouseUp}
+        onMouseLeave={onMouseUp}
         onContextMenu={(e) => e.preventDefault()}
       >
         {svgItems}
