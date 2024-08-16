@@ -10,6 +10,10 @@ import {
 } from "@mui/icons-material";
 import { Box, IconButton, Toolbar, Typography } from "@mui/material";
 
+const getColor = (id: number) => {
+  return `hsl(${(id % 12) * 30}, ${100 - (Math.floor(id / 12) % 2) * 50}%, 80%)`;
+};
+
 const PlanarAnswerBoard = (props: {
   answer: Answer;
   height: number;
@@ -26,48 +30,34 @@ const PlanarAnswerBoard = (props: {
 
   const items = [];
 
-  const colors = [
-    "#ff0000",
-    "#00ff00",
-    "#0000ff",
-    "#ffff00",
-    "#00ffff",
-    "#ff00ff",
-    "#ff8000",
-    "#ff0080",
-    "#80ff00",
-    "#0080ff",
-  ];
+  items.push(
+    <rect
+      key="background"
+      x={margin}
+      y={margin}
+      width={width * gridSize}
+      height={height * gridSize}
+      fill="#eeeeee"
+    />,
+  );
 
   for (let y = 0; y < height; ++y) {
     for (let x = 0; x < width; ++x) {
       const item = answerData[y * width + x];
 
-      if (item[0] < 0) {
-        items.push(
-          <rect
-            key={`${y},${x}`}
-            x={x * gridSize + margin}
-            y={y * gridSize + margin}
-            width={gridSize}
-            height={gridSize}
-            fill="#cccccc"
-            stroke="black"
-          />,
-        );
-      } else {
-        items.push(
-          <rect
-            key={`${y},${x}`}
-            x={x * gridSize + margin}
-            y={y * gridSize + margin}
-            width={gridSize}
-            height={gridSize}
-            fill={colors[item[0] % colors.length]}
-            stroke="black"
-          />,
-        );
-      }
+      if (item[0] < 0) continue;
+
+      items.push(
+        <rect
+          key={`${y},${x}`}
+          x={x * gridSize + margin}
+          y={y * gridSize + margin}
+          width={gridSize}
+          height={gridSize}
+          fill={getColor(item[0])}
+          stroke="#888888"
+        />,
+      );
     }
   }
   return (
