@@ -1,6 +1,7 @@
 import { useState } from "react";
 
-import { Box, Grid } from "@mui/material";
+import { Box, Grid, IconButton, Menu, MenuItem } from "@mui/material";
+import { Menu as MenuIcon } from "@mui/icons-material";
 import AppBar from "@mui/material/AppBar";
 import Container from "@mui/material/Container";
 import Toolbar from "@mui/material/Toolbar";
@@ -12,19 +13,41 @@ import { SolverPanel } from "./SolverPanel";
 // import "./App.css";
 
 function App() {
-  const [board, setBoard] = useState<number[][][]>([[[0]]]);
+  const [board, setBoard] = useState<number[][][]>([[[1]]]);
   const [pieces, setPieces] = useState<number[][][][]>([[[[1]]]]);
+
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const handleOpenAppMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleCloseAppMenu = () => {
+    setAnchorEl(null);
+  };
+
+  const onNewProblem = () => {
+    // TODO: show confirmation dialog
+    setBoard([[[1]]]);
+    setPieces([[[[1]]]]);
+    setAnchorEl(null);
+  };
 
   return (
     <Container maxWidth="md">
       <AppBar position="sticky">
         <Toolbar variant="dense">
-          <Typography
-            variant="h6"
+          <IconButton
+            size="small"
+            edge="start"
             color="inherit"
-            component="div"
-            sx={{ flexGlow: 1 }}
+            sx={{ ml: -2, mr: 1 }}
+            aria-controls={anchorEl !== null ? "app-menu" : undefined}
+            aria-haspopup="true"
+            aria-expanded={anchorEl !== null ? "true" : undefined}
+            onClick={handleOpenAppMenu}
           >
+            <MenuIcon />
+          </IconButton>
+          <Typography variant="h6" color="inherit" component="div">
             Polymate
           </Typography>
         </Toolbar>
@@ -65,6 +88,16 @@ function App() {
           <SolverPanel pieces={pieces} board={board} />
         </Grid>
       </Grid>
+
+      <Menu
+        id="app-menu"
+        anchorEl={anchorEl}
+        open={anchorEl !== null}
+        onClose={handleCloseAppMenu}
+        MenuListProps={{ "aria-labelledby": "app-menu" }}
+      >
+        <MenuItem onClick={onNewProblem}>New Problem</MenuItem>
+      </Menu>
     </Container>
   );
 }
