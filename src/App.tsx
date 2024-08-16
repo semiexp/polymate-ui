@@ -1,7 +1,16 @@
 import { useState } from "react";
 
-import { Box, Grid, IconButton, Menu, MenuItem } from "@mui/material";
-import { Menu as MenuIcon } from "@mui/icons-material";
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Box,
+  Grid,
+  IconButton,
+  Menu,
+  MenuItem,
+} from "@mui/material";
+import { ExpandMore, Menu as MenuIcon } from "@mui/icons-material";
 import AppBar from "@mui/material/AppBar";
 import Container from "@mui/material/Container";
 import Toolbar from "@mui/material/Toolbar";
@@ -10,6 +19,7 @@ import Typography from "@mui/material/Typography";
 import { PiecesManager } from "./PiecesManager";
 import { ShapeEditor } from "./ShapeEditor";
 import { SolverPanel } from "./SolverPanel";
+import { presets } from "./Presets";
 // import "./App.css";
 
 function App() {
@@ -28,6 +38,12 @@ function App() {
     // TODO: show confirmation dialog
     setBoard([[[1]]]);
     setPieces([[[[1]]]]);
+    setAnchorEl(null);
+  };
+  const onUsePreset = (presetIdx: number) => {
+    console.log(presets[presetIdx].board);
+    setBoard(presets[presetIdx].board);
+    setPieces(presets[presetIdx].pieces);
     setAnchorEl(null);
   };
 
@@ -97,6 +113,25 @@ function App() {
         MenuListProps={{ "aria-labelledby": "app-menu" }}
       >
         <MenuItem onClick={onNewProblem}>New Problem</MenuItem>
+        <Accordion
+          elevation={0}
+          sx={{ backgroundColor: "transparent" }}
+          disableGutters
+        >
+          <AccordionSummary
+            sx={{ padding: 0, minHeight: 0 }}
+            expandIcon={<ExpandMore />}
+          >
+            <MenuItem sx={{ margin: 0 }}>Load presets</MenuItem>
+          </AccordionSummary>
+          <AccordionDetails sx={{ pt: 0, pb: 0, margin: 0 }}>
+            {presets.map((preset, i) => (
+              <MenuItem key={`${i}`} onClick={() => onUsePreset(i)}>
+                {preset.name}
+              </MenuItem>
+            ))}
+          </AccordionDetails>
+        </Accordion>
       </Menu>
     </Container>
   );
