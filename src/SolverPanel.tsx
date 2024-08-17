@@ -60,6 +60,69 @@ const PlanarAnswerBoard = (props: {
       );
     }
   }
+
+  const thickBorderWidth = 3;
+
+  for (let y = 0; y < height; ++y) {
+    for (let x = 0; x <= width; ++x) {
+      let hasWall = false;
+
+      if (x == 0) {
+        hasWall = answerData[y * width][0] >= 0;
+      } else if (x == width) {
+        hasWall = answerData[y * width + width - 1][0] >= 0;
+      } else {
+        const a = answerData[y * width + x - 1];
+        const b = answerData[y * width + x];
+        hasWall = a[0] !== b[0] || a[1] !== b[1];
+      }
+
+      if (hasWall) {
+        items.push(
+          <line
+            key={`v${y},${x}`}
+            x1={x * gridSize + margin}
+            y1={y * gridSize + margin - thickBorderWidth * 0.5}
+            x2={x * gridSize + margin}
+            y2={(y + 1) * gridSize + margin + thickBorderWidth * 0.5}
+            strokeWidth={thickBorderWidth}
+            stroke="#333333"
+          />,
+        );
+      }
+    }
+  }
+
+  for (let y = 0; y <= height; ++y) {
+    for (let x = 0; x < width; ++x) {
+      let hasWall = false;
+
+      if (y == 0) {
+        hasWall = answerData[x][0] >= 0;
+      } else if (y == height) {
+        hasWall = answerData[(height - 1) * width + x][0] >= 0;
+      } else {
+        const a = answerData[(y - 1) * width + x];
+        const b = answerData[y * width + x];
+        hasWall = a[0] !== b[0] || a[1] !== b[1];
+      }
+
+      if (hasWall) {
+        items.push(
+          <line
+            key={`h${y},${x}`}
+            x1={x * gridSize + margin - thickBorderWidth * 0.5}
+            y1={y * gridSize + margin}
+            x2={(x + 1) * gridSize + margin + thickBorderWidth * 0.5}
+            y2={y * gridSize + margin}
+            strokeWidth={thickBorderWidth}
+            stroke="#333333"
+          />,
+        );
+      }
+    }
+  }
+
   return (
     <svg height={svgHeight} width={svgWidth}>
       {items}
