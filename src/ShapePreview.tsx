@@ -1,5 +1,6 @@
 export type ShapePreviewProps = {
   shape: number[][][];
+  count: number;
   color: string;
   maxGridSize: number;
   padding: number;
@@ -9,7 +10,7 @@ export type ShapePreviewProps = {
 };
 
 export const ShapePreview = (props: ShapePreviewProps) => {
-  const { shape, color, maxGridSize, padding, height, maxWidth } = props;
+  const { shape, count, color, maxGridSize, padding, height, maxWidth } = props;
 
   const sizeZ = shape.length;
   const sizeY = shape[0].length;
@@ -24,7 +25,7 @@ export const ShapePreview = (props: ShapePreviewProps) => {
     Math.floor(height / (sizeY + padding)),
     Math.floor(maxWidth / (sizeX + padding)),
   );
-  const width = gridSize * (sizeX + padding);
+  const width = gridSize * (Math.max(2, sizeX) + padding);
 
   const offsetX = (width - gridSize * sizeX) * 0.5;
   const offsetY = (height - gridSize * sizeY) * 0.5;
@@ -46,6 +47,14 @@ export const ShapePreview = (props: ShapePreviewProps) => {
         );
       }
     }
+  }
+
+  if (count !== 1) {
+    items.push(
+      <text x={0} y={height} fill="#aa0000" fontSize={15}>
+        {count}
+      </text>,
+    );
   }
 
   return (

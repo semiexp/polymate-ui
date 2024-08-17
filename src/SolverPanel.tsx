@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { solve, Answer, Answers } from "./Solver";
+import { DetailedPiece } from "./shape";
 import {
   KeyboardArrowLeft,
   KeyboardArrowRight,
@@ -131,7 +132,7 @@ const PlanarAnswerBoard = (props: {
 };
 
 export type SolverPanelProps = {
-  pieces: number[][][][];
+  pieces: DetailedPiece[];
   board: number[][][];
 };
 
@@ -144,7 +145,11 @@ export const SolverPanel = (props: SolverPanelProps) => {
   >(undefined);
 
   const onSolve = () => {
-    const problem = { pieces, board };
+    const problem = {
+      pieces: pieces.map((p) => p.shape),
+      piece_count: pieces.map((p) => p.count),
+      board,
+    };
     const answers = solve(problem);
 
     setAnswerState({ answers, board });

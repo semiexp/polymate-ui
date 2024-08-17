@@ -20,11 +20,17 @@ import { PiecesManager } from "./PiecesManager";
 import { ShapeEditor } from "./ShapeEditor";
 import { SolverPanel } from "./SolverPanel";
 import { presets } from "./Presets";
+import { DetailedPiece } from "./shape";
 // import "./App.css";
 
 function App() {
   const [board, setBoard] = useState<number[][][]>([[[1]]]);
-  const [pieces, setPieces] = useState<number[][][][]>([[[[1]]]]);
+  const [pieces, setPieces] = useState<DetailedPiece[]>([
+    {
+      shape: [[[1]]],
+      count: 1,
+    },
+  ]);
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const handleOpenAppMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -37,7 +43,12 @@ function App() {
   const onNewProblem = () => {
     // TODO: show confirmation dialog
     setBoard([[[1]]]);
-    setPieces([[[[1]]]]);
+    setPieces([
+      {
+        shape: [[[1]]],
+        count: 1,
+      },
+    ]);
     setAnchorEl(null);
   };
   const onUsePreset = (presetIdx: number) => {
