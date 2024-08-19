@@ -31,6 +31,7 @@ function App() {
       count: 1,
     },
   ]);
+  const [shapeEditorGeneration, setShapeEditorGeneration] = useState(0);
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const handleOpenAppMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -49,12 +50,14 @@ function App() {
         count: 1,
       },
     ]);
+    setShapeEditorGeneration(shapeEditorGeneration ^ 1);
     setAnchorEl(null);
   };
   const onUsePreset = (presetIdx: number) => {
     console.log(presets[presetIdx].board);
     setBoard(presets[presetIdx].board);
     setPieces(presets[presetIdx].pieces);
+    setShapeEditorGeneration(shapeEditorGeneration ^ 1);
     setAnchorEl(null);
   };
 
@@ -107,6 +110,7 @@ function App() {
                 shape={board}
                 onChange={(shape) => setBoard(shape)}
                 planarGridSize={32}
+                key={shapeEditorGeneration}
               />
             </Box>
           </Box>
