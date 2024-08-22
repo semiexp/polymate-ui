@@ -89,9 +89,17 @@ const PlanarShapeEditor = (props: PlanarShapeEditorProps) => {
         setHeight(current.clientHeight);
       }
     };
+
+    const observer = new ResizeObserver(() => {
+      set();
+    });
+    if (boxRef.current) {
+      observer.observe(boxRef.current);
+    }
     set();
-    window.addEventListener("resize", set);
-    return () => window.removeEventListener("resize", set);
+    return () => {
+      observer.disconnect();
+    };
   }, [boxRef]);
 
   const svgItems = [];
