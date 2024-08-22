@@ -87,9 +87,9 @@ const ShapePreview3D = (props: ShapePreviewProps) => {
   for (let z = sizeZ - 1; z >= 0; --z) {
     for (let y = sizeY - 1; y >= 0; --y) {
       for (let x = 0; x < sizeX; ++x) {
-        if (shape[z][y][x] === 1) {
-          let midx = (x + 1 + z * diagonalRatio) * gridSize + offsetX;
-          let midy = (y + (sizeZ - z) * diagonalRatio) * gridSize + offsetY;
+        if (shape[sizeZ - 1 - z][y][x] === 1) {
+          const midx = (x + 1 + z * diagonalRatio) * gridSize + offsetX;
+          const midy = (y + (sizeZ - z) * diagonalRatio) * gridSize + offsetY;
           items.push(
             <polygon
               key={`${z},${y},${x},a`}
