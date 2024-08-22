@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Box, Tab, Tabs } from "@mui/material";
 
+import { CubicShapeEditor } from "./cubicShapeEditor";
+
 type PlanarShapeEditorProps = {
   shape: number[][];
   onChange: (shape: number[][]) => void;
@@ -65,7 +67,7 @@ const updateShape = (
 const PlanarShapeEditor = (props: PlanarShapeEditorProps) => {
   const { shape, onChange, gridSize } = props;
 
-  const boxRef = useRef<SVGSVGElement>(null);
+  const boxRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(-1);
   const [height, setHeight] = useState(-1);
 
@@ -292,6 +294,7 @@ export const ShapeEditor = (props: ShapeEditorProps) => {
           gridSize={32}
         />
       )}
+      {tabValue === 1 && <CubicShapeEditor shape={shape} onChange={onChange} />}
     </Box>
   );
 };
