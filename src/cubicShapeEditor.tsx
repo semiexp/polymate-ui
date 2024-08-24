@@ -196,6 +196,7 @@ export const CubicShapeEditor = (props: CubicShapeEditorProps) => {
     mouseX: number;
     mouseY: number;
   } | null>(null);
+  const [isMoveCenter, setIsMoveCenter] = useState(false);
 
   const projectedSurfaces = camera.projectSurfaces(surfaces);
   projectedSurfaces.reverse(); // draw nearer surfaces later
@@ -240,6 +241,11 @@ export const CubicShapeEditor = (props: CubicShapeEditorProps) => {
       }
     } else if (e.nativeEvent.button === 2) {
       setCameraOnMouseDown({ camera, mouseX: x, mouseY: y });
+      if (e.ctrlKey) {
+        setIsMoveCenter(true);
+      } else {
+        setIsMoveCenter(false);
+      }
       e.preventDefault();
     }
   };
@@ -254,7 +260,18 @@ export const CubicShapeEditor = (props: CubicShapeEditorProps) => {
 
     const dx = x - cameraOnMouseDown.mouseX;
     const dy = -(y - cameraOnMouseDown.mouseY);
-    setCamera(cameraOnMouseDown.camera.rotateView(dx, dy, 1.0 / scale));
+
+    if (isMoveCenter) {
+      setCamera(
+        cameraOnMouseDown.camera.moveCenter(
+          camera.cameraRight
+            .scale(-dx / scale)
+            .add(camera.cameraUp.scale(-dy / scale)),
+        ),
+      );
+    } else {
+      setCamera(cameraOnMouseDown.camera.rotateView(dx, dy, 1.0 / scale));
+    }
   };
 
   const onMouseUp = () => {
