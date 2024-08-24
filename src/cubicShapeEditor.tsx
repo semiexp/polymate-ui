@@ -239,6 +239,9 @@ export const CubicShapeEditor = (props: CubicShapeEditorProps) => {
           ),
         );
       }
+    } else if (e.nativeEvent.button === 1) {
+      setCameraOnMouseDown({ camera, mouseX: x, mouseY: y });
+      setIsMoveCenter(true);
     } else if (e.nativeEvent.button === 2) {
       setCameraOnMouseDown({ camera, mouseX: x, mouseY: y });
       if (e.ctrlKey) {
