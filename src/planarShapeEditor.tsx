@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Box } from "@mui/material";
 
 type PlanarShapeEditorProps = {
@@ -63,7 +63,6 @@ const updateShape = (
 };
 
 export const PlanarShapeEditor = (props: PlanarShapeEditorProps) => {
-  const gridSize = props.gridSize;
   const [shape, _setShape] = useState(props.initialShape);
 
   const setShape = (shape: number[][]) => {
@@ -74,6 +73,9 @@ export const PlanarShapeEditor = (props: PlanarShapeEditorProps) => {
   const boxRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(-1);
   const [height, setHeight] = useState(-1);
+
+  const [zoomLevel, setZoomLevel] = useState(0);
+  const gridSize = props.gridSize * Math.pow(1.5, zoomLevel);
 
   // relative position at which the cell (0, 0) is drawn
   const [dx, setDx] = useState(-(shape[0].length - 1) * gridSize * 0.5);
@@ -223,6 +225,14 @@ export const PlanarShapeEditor = (props: PlanarShapeEditorProps) => {
     }
   };
 
+  const onWheel = (e: React.WheelEvent) => {
+    const newZoomLevel = zoomLevel + (e.deltaY > 0 ? -1 : 1);
+    if (!(-2 <= newZoomLevel && newZoomLevel <= 1)) {
+      return;
+    }
+    setZoomLevel(newZoomLevel);
+  };
+
   const onMouseUp = () => {
     setDragging(false);
     setUpdateValue(null);
@@ -247,6 +257,7 @@ export const PlanarShapeEditor = (props: PlanarShapeEditorProps) => {
         onMouseMove={onMouseMove}
         onMouseUp={onMouseUp}
         onMouseLeave={onMouseUp}
+        onWheel={onWheel}
         onContextMenu={(e) => e.preventDefault()}
       >
         {svgItems}
