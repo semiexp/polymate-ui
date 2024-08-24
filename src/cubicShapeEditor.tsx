@@ -110,10 +110,12 @@ export const CubicShapeEditor = (props: CubicShapeEditorProps) => {
   const dimY = shape[0].length;
   const dimZ = shape.length;
 
-  const surfaces: Surface<{
+  type ExtraInfo = {
     color: string;
+    cube: { x: number; y: number; z: number };
     anotherCube: { x: number; y: number; z: number };
-  }>[] = [];
+  };
+  const surfaces: Surface<ExtraInfo>[] = [];
 
   const maybeAddSurface = (
     z0: number,
@@ -157,10 +159,12 @@ export const CubicShapeEditor = (props: CubicShapeEditorProps) => {
       new Vector3(x1 + dy, y1 + dz, z1 + dx),
     ];
 
+    const cube = hasBox0 ? { x: x0, y: y0, z: z0 } : { x: x1, y: y1, z: z1 };
+
     const anotherCube = hasBox0
       ? { x: x1, y: y1, z: z1 }
       : { x: x0, y: y0, z: z0 };
-    surfaces.push({ data: { color, anotherCube }, vertices });
+    surfaces.push({ data: { color, cube, anotherCube }, vertices });
   };
 
   for (let z = 0; z < dimZ; ++z) {
@@ -209,7 +213,7 @@ export const CubicShapeEditor = (props: CubicShapeEditorProps) => {
       const relX = x - width / 2;
       const relY = -(y - height / 2);
 
-      let addedBox: { x: number; y: number; z: number } | null = null;
+      let selectedSurface: ExtraInfo | null = null;
 
       for (let i = projectedSurfaces.length - 1; i >= 0; --i) {
         const surface = projectedSurfaces[i];
@@ -219,19 +223,30 @@ export const CubicShapeEditor = (props: CubicShapeEditorProps) => {
             y: relY / scale,
           })
         ) {
-          addedBox = surface.data.anotherCube;
+          selectedSurface = surface.data;
           break;
         }
       }
 
-      if (addedBox !== null) {
-        const updated = updateShape(
-          shape,
-          addedBox.x,
-          addedBox.y,
-          addedBox.z,
-          1,
-        );
+      if (selectedSurface !== null) {
+        let updated;
+        if (e.ctrlKey) {
+          updated = updateShape(
+            shape,
+            selectedSurface.cube.x,
+            selectedSurface.cube.y,
+            selectedSurface.cube.z,
+            0,
+          );
+        } else {
+          updated = updateShape(
+            shape,
+            selectedSurface.anotherCube.x,
+            selectedSurface.anotherCube.y,
+            selectedSurface.anotherCube.z,
+            1,
+          );
+        }
         setShape(updated.shape);
         setCamera(
           camera.moveCenter(
