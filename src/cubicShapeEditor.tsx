@@ -144,7 +144,7 @@ export const CubicShapeEditor = (props: CubicShapeEditorProps) => {
       return;
     }
 
-    const color = "#ffcccc";
+    const color = "#ccccff";
 
     const dz = z1 - z0;
     const dy = y1 - y0;
