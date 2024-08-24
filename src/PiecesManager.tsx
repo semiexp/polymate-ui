@@ -42,7 +42,7 @@ export const PiecesManager = (props: PiecesManagerProps) => {
 
   const onAddPiece = async () => {
     const newShape = await pieceEditorDialogRef.current!.open({
-      shape: [[[0]]],
+      shape: [[[1]]],
       count: 1,
     });
     if (newShape) {
