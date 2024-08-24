@@ -232,6 +232,11 @@ export const CubicShapeEditor = (props: CubicShapeEditorProps) => {
           1,
         );
         setShape(updated.shape);
+        setCamera(
+          camera.moveCenter(
+            new Vector3(-updated.offsetX, -updated.offsetY, -updated.offsetZ),
+          ),
+        );
       }
     } else if (e.nativeEvent.button === 2) {
       setCameraOnMouseDown({ camera, mouseX: x, mouseY: y });

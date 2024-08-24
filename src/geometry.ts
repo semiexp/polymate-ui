@@ -82,6 +82,10 @@ export class Camera {
     this.cameraRight = w;
   }
 
+  moveCenter(delta: Vector3): Camera {
+    return new Camera(this.center.add(delta), this.cameraDir, this.cameraUp);
+  }
+
   project(v: Vector3): Point2 {
     const p = v.sub(this.center);
     return {
