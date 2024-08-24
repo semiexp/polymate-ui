@@ -103,6 +103,9 @@ export const CubicShapeEditor = (props: CubicShapeEditorProps) => {
     props.onChange(shape);
   };
 
+  const [zoomLevel, setZoomLevel] = useState(1.0);
+  const scale = 50.0 * Math.pow(1.5, zoomLevel);
+
   const dimX = shape[0][0].length;
   const dimY = shape[0].length;
   const dimZ = shape.length;
@@ -211,8 +214,8 @@ export const CubicShapeEditor = (props: CubicShapeEditorProps) => {
         const surface = projectedSurfaces[i];
         if (
           isContainedInConvexPolygon(surface.vertices, {
-            x: relX / 100,
-            y: relY / 100,
+            x: relX / scale,
+            y: relY / scale,
           })
         ) {
           addedBox = surface.data.anotherCube;
@@ -246,11 +249,19 @@ export const CubicShapeEditor = (props: CubicShapeEditorProps) => {
 
     const dx = x - cameraOnMouseDown.mouseX;
     const dy = -(y - cameraOnMouseDown.mouseY);
-    setCamera(cameraOnMouseDown.camera.rotateView(dx, dy, 1.0 / 100));
+    setCamera(cameraOnMouseDown.camera.rotateView(dx, dy, 1.0 / scale));
   };
 
   const onMouseUp = () => {
     setCameraOnMouseDown(null);
+  };
+
+  const onWheel = (e: React.WheelEvent) => {
+    const newZoomLevel = zoomLevel + (e.deltaY > 0 ? -1 : 1);
+    if (!(-2 <= newZoomLevel && newZoomLevel <= 1)) {
+      return;
+    }
+    setZoomLevel(newZoomLevel);
   };
 
   const boxRef = useRef<HTMLDivElement>(null);
@@ -282,8 +293,8 @@ export const CubicShapeEditor = (props: CubicShapeEditorProps) => {
 
   for (const surface of projectedSurfaces) {
     const points = surface.vertices.map((v) => ({
-      x: v.x * 100 + width / 2,
-      y: -v.y * 100 + height / 2,
+      x: v.x * scale + width / 2,
+      y: -v.y * scale + height / 2,
     }));
 
     items.push(
@@ -312,6 +323,7 @@ export const CubicShapeEditor = (props: CubicShapeEditorProps) => {
         onMouseDown={onMouseDown}
         onMouseMove={onMouseMove}
         onMouseUp={onMouseUp}
+        onWheel={onWheel}
         onContextMenu={(e) => e.preventDefault()}
       >
         {items}
