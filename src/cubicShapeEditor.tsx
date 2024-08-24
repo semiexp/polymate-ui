@@ -10,7 +10,7 @@ import {
 import { Box } from "@mui/material";
 
 export type CubicShapeEditorProps = {
-  shape: Shape;
+  initialShape: Shape;
   onChange: (shape: Shape) => void;
 };
 
@@ -95,7 +95,13 @@ const updateShape = (
 };
 
 export const CubicShapeEditor = (props: CubicShapeEditorProps) => {
-  const { shape } = props;
+  // TODO: automatically rotate
+  const [shape, _setShape] = useState(props.initialShape);
+
+  const setShape = (shape: Shape) => {
+    _setShape(shape);
+    props.onChange(shape);
+  };
 
   const dimX = shape[0][0].length;
   const dimY = shape[0].length;
@@ -222,7 +228,7 @@ export const CubicShapeEditor = (props: CubicShapeEditorProps) => {
           addedBox.z,
           1,
         );
-        props.onChange(updated.shape);
+        setShape(updated.shape);
       }
     } else if (e.nativeEvent.button === 2) {
       setCameraOnMouseDown({ camera, mouseX: x, mouseY: y });

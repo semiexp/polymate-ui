@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Box } from "@mui/material";
 
 type PlanarShapeEditorProps = {
-  shape: number[][];
+  initialShape: number[][];
   onChange: (shape: number[][]) => void;
   gridSize: number;
 };
@@ -63,7 +63,13 @@ const updateShape = (
 };
 
 export const PlanarShapeEditor = (props: PlanarShapeEditorProps) => {
-  const { shape, onChange, gridSize } = props;
+  const gridSize = props.gridSize;
+  const [shape, _setShape] = useState(props.initialShape);
+
+  const setShape = (shape: number[][]) => {
+    _setShape(shape);
+    props.onChange(shape);
+  };
 
   const boxRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(-1);
@@ -184,7 +190,7 @@ export const PlanarShapeEditor = (props: PlanarShapeEditorProps) => {
 
     setUpdateValue(newValue);
     const updated = updateShape(shape, x, y, newValue);
-    onChange(updated.shape);
+    setShape(updated.shape);
     setDx(dx + updated.offsetX * gridSize);
     setDy(dy + updated.offsetY * gridSize);
   };
@@ -211,7 +217,7 @@ export const PlanarShapeEditor = (props: PlanarShapeEditorProps) => {
       }
 
       const updated = updateShape(shape, x, y, updateValue);
-      onChange(updated.shape);
+      setShape(updated.shape);
       setDx(dx + updated.offsetX * gridSize);
       setDy(dy + updated.offsetY * gridSize);
     }

@@ -40,14 +40,16 @@ export const ShapeEditor = (props: ShapeEditorProps) => {
       </Box>
       {tabValue === 0 && (
         <PlanarShapeEditor
-          shape={shape[0]}
+          initialShape={shape[0]}
           onChange={(s) => {
             onChange([s]);
           }}
           gridSize={32}
         />
       )}
-      {tabValue === 1 && <CubicShapeEditor shape={shape} onChange={onChange} />}
+      {tabValue === 1 && (
+        <CubicShapeEditor initialShape={shape} onChange={onChange} />
+      )}
     </Box>
   );
 };
