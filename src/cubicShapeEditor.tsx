@@ -94,6 +94,72 @@ const updateShape = (
   return { shape: newShape, offsetX: minX, offsetY: minY, offsetZ: minZ };
 };
 
+type Coord = { x: number; y: number; z: number };
+type ExtraInfo = {
+  color: string;
+  cube: Coord;
+  anotherCube: Coord;
+};
+
+const neighbors = [
+  { x: 0, y: 0, z: 1 },
+  { x: 0, y: 1, z: 0 },
+  { x: 1, y: 0, z: 0 },
+  { x: 0, y: 0, z: -1 },
+  { x: 0, y: -1, z: 0 },
+  { x: -1, y: 0, z: 0 },
+];
+
+const enumerateSurfaces = (
+  cubes: { coord: Coord; color: string }[],
+): Surface<ExtraInfo>[] => {
+  const surfaces: Surface<ExtraInfo>[] = [];
+
+  const maybeAddSurface = (cube: Coord, anotherCube: Coord, color: string) => {
+    for (const c of cubes) {
+      if (
+        c.coord.x === anotherCube.x &&
+        c.coord.y === anotherCube.y &&
+        c.coord.z === anotherCube.z
+      ) {
+        return;
+      }
+    }
+
+    const x = Math.max(cube.x, anotherCube.x);
+    const y = Math.max(cube.y, anotherCube.y);
+    const z = Math.max(cube.z, anotherCube.z);
+    const dx = Math.abs(anotherCube.x - cube.x);
+    const dy = Math.abs(anotherCube.y - cube.y);
+    const dz = Math.abs(anotherCube.z - cube.z);
+
+    const vertices = [
+      new Vector3(x, y, z),
+      new Vector3(x + dz, y + dx, z + dy),
+      new Vector3(x + dy + dz, y + dz + dx, z + dx + dy),
+      new Vector3(x + dy, y + dz, z + dx),
+    ];
+
+    surfaces.push({
+      data: { color, cube, anotherCube },
+      vertices,
+    });
+  };
+
+  for (const c of cubes) {
+    for (const nb of neighbors) {
+      const anotherCube = {
+        x: c.coord.x + nb.x,
+        y: c.coord.y + nb.y,
+        z: c.coord.z + nb.z,
+      };
+      maybeAddSurface(c.coord, anotherCube, c.color);
+    }
+  }
+
+  return surfaces;
+};
+
 export const CubicShapeEditor = (props: CubicShapeEditorProps) => {
   // TODO: automatically rotate
   const [shape, _setShape] = useState(props.initialShape);
@@ -110,83 +176,17 @@ export const CubicShapeEditor = (props: CubicShapeEditorProps) => {
   const dimY = shape[0].length;
   const dimZ = shape.length;
 
-  type ExtraInfo = {
-    color: string;
-    cube: { x: number; y: number; z: number };
-    anotherCube: { x: number; y: number; z: number };
-  };
-  const surfaces: Surface<ExtraInfo>[] = [];
-
-  const maybeAddSurface = (
-    z0: number,
-    y0: number,
-    x0: number,
-    z1: number,
-    y1: number,
-    x1: number,
-  ) => {
-    const hasBox0 =
-      0 <= z0 &&
-      z0 < dimZ &&
-      0 <= y0 &&
-      y0 < dimY &&
-      0 <= x0 &&
-      x0 < dimX &&
-      shape[z0][y0][x0] === 1;
-    const hasBox1 =
-      0 <= z1 &&
-      z1 < dimZ &&
-      0 <= y1 &&
-      y1 < dimY &&
-      0 <= x1 &&
-      x1 < dimX &&
-      shape[z1][y1][x1] === 1;
-
-    if (hasBox0 === hasBox1) {
-      return;
-    }
-
-    const color = "#ccccff";
-
-    const dz = z1 - z0;
-    const dy = y1 - y0;
-    const dx = x1 - x0;
-
-    const vertices = [
-      new Vector3(x1, y1, z1),
-      new Vector3(x1 + dz, y1 + dx, z1 + dy),
-      new Vector3(x1 + dy + dz, y1 + dz + dx, z1 + dx + dy),
-      new Vector3(x1 + dy, y1 + dz, z1 + dx),
-    ];
-
-    const cube = hasBox0 ? { x: x0, y: y0, z: z0 } : { x: x1, y: y1, z: z1 };
-
-    const anotherCube = hasBox0
-      ? { x: x1, y: y1, z: z1 }
-      : { x: x0, y: y0, z: z0 };
-    surfaces.push({ data: { color, cube, anotherCube }, vertices });
-  };
-
+  const cubes = [];
   for (let z = 0; z < dimZ; ++z) {
     for (let y = 0; y < dimY; ++y) {
       for (let x = 0; x < dimX; ++x) {
-        if (x == 0) {
-          maybeAddSurface(z, y, x - 1, z, y, x);
+        if (shape[z][y][x] === 1) {
+          cubes.push({ coord: { x, y, z }, color: "#ccccff" });
         }
-        maybeAddSurface(z, y, x, z, y, x + 1);
-
-        if (y == 0) {
-          maybeAddSurface(z, y - 1, x, z, y, x);
-        }
-        maybeAddSurface(z, y, x, z, y + 1, x);
-
-        if (z == 0) {
-          maybeAddSurface(z - 1, y, x, z, y, x);
-        }
-        maybeAddSurface(z, y, x, z + 1, y, x);
       }
     }
   }
+  const surfaces = enumerateSurfaces(cubes);
 
   const [camera, setCamera] = useState(
     new Camera(
