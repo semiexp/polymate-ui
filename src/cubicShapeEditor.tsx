@@ -116,16 +116,6 @@ const enumerateSurfaces = (
   const surfaces: Surface<ExtraInfo>[] = [];
 
   const maybeAddSurface = (cube: Coord, anotherCube: Coord, color: string) => {
-    for (const c of cubes) {
-      if (
-        c.coord.x === anotherCube.x &&
-        c.coord.y === anotherCube.y &&
-        c.coord.z === anotherCube.z
-      ) {
-        return;
-      }
-    }
-
     const x = Math.max(cube.x, anotherCube.x);
     const y = Math.max(cube.y, anotherCube.y);
     const z = Math.max(cube.z, anotherCube.z);
@@ -186,7 +176,6 @@ export const CubicShapeEditor = (props: CubicShapeEditorProps) => {
       }
     }
   }
-  const surfaces = enumerateSurfaces(cubes);
 
   const [camera, setCamera] = useState(
     new Camera(
@@ -201,33 +190,65 @@ export const CubicShapeEditor = (props: CubicShapeEditorProps) => {
     mouseY: number;
   } | null>(null);
   const [isMoveCenter, setIsMoveCenter] = useState(false);
+  const [mouseX, setMouseX] = useState(-1);
+  const [mouseY, setMouseY] = useState(-1);
+  const [isDeleteMode, setIsDeleteMode] = useState(false);
+  const boxRef = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState(-1);
+  const [height, setHeight] = useState(-1);
 
-  const projectedSurfaces = camera.projectSurfaces(surfaces);
+  const projectedSurfaces = camera.projectSurfaces(enumerateSurfaces(cubes));
   projectedSurfaces.reverse(); // draw nearer surfaces later
+
+  let selectedSurface: ExtraInfo | null = null;
+
+  if (mouseX >= 0) {
+    const relX = mouseX - width / 2;
+    const relY = -(mouseY - height / 2);
+
+    for (let i = projectedSurfaces.length - 1; i >= 0; --i) {
+      const surface = projectedSurfaces[i];
+      if (
+        isContainedInConvexPolygon(surface.vertices, {
+          x: relX / scale,
+          y: relY / scale,
+        })
+      ) {
+        selectedSurface = surface.data;
+        break;
+      }
+    }
+  }
+
+  if (selectedSurface !== null) {
+    if (isDeleteMode) {
+      cubes.forEach((c) => {
+        if (
+          c.coord.x === selectedSurface.cube.x &&
+          c.coord.y === selectedSurface.cube.y &&
+          c.coord.z === selectedSurface.cube.z
+        ) {
+          c.color = "rgb(238 238 255 / 50%)";
+        }
+      });
+    } else {
+      cubes.push({
+        coord: selectedSurface.anotherCube,
+        color: "rgb(255 204 204 / 50%)",
+      });
+    }
+  }
+
+  const actualProjectedSurfaces = camera.projectSurfaces(
+    enumerateSurfaces(cubes),
+  );
+  actualProjectedSurfaces.reverse(); // draw nearer surfaces later
 
   const onMouseDown = (e: React.MouseEvent<SVGSVGElement>) => {
     const x = e.nativeEvent.offsetX;
     const y = e.nativeEvent.offsetY;
 
     if (e.nativeEvent.button === 0) {
-      const relX = x - width / 2;
-      const relY = -(y - height / 2);
-
-      let selectedSurface: ExtraInfo | null = null;
-
-      for (let i = projectedSurfaces.length - 1; i >= 0; --i) {
-        const surface = projectedSurfaces[i];
-        if (
-          isContainedInConvexPolygon(surface.vertices, {
-            x: relX / scale,
-            y: relY / scale,
-          })
-        ) {
-          selectedSurface = surface.data;
-          break;
-        }
-      }
-
       if (selectedSurface !== null) {
         let updated;
         if (e.ctrlKey) {
@@ -269,12 +290,16 @@ export const CubicShapeEditor = (props: CubicShapeEditorProps) => {
   };
 
   const onMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
+    const x = e.nativeEvent.offsetX;
+    const y = e.nativeEvent.offsetY;
+
+    setMouseX(x);
+    setMouseY(y);
+    setIsDeleteMode(e.ctrlKey);
+
     if (!cameraOnMouseDown) {
       return;
     }
-
-    const x = e.nativeEvent.offsetX;
-    const y = e.nativeEvent.offsetY;
 
     const dx = x - cameraOnMouseDown.mouseX;
     const dy = -(y - cameraOnMouseDown.mouseY);
@@ -296,6 +321,12 @@ export const CubicShapeEditor = (props: CubicShapeEditorProps) => {
     setCameraOnMouseDown(null);
   };
 
+  const onMouseLeave = () => {
+    setCameraOnMouseDown(null);
+    setMouseX(-1);
+    setMouseY(-1);
+  };
+
   const onWheel = (e: React.WheelEvent) => {
     const newZoomLevel = zoomLevel + (e.deltaY > 0 ? -1 : 1);
     if (!(-2 <= newZoomLevel && newZoomLevel <= 1)) {
@@ -303,10 +334,6 @@ export const CubicShapeEditor = (props: CubicShapeEditorProps) => {
     }
     setZoomLevel(newZoomLevel);
   };
-
-  const boxRef = useRef<HTMLDivElement>(null);
-  const [width, setWidth] = useState(-1);
-  const [height, setHeight] = useState(-1);
 
   useEffect(() => {
     const set = () => {
@@ -331,7 +358,7 @@ export const CubicShapeEditor = (props: CubicShapeEditorProps) => {
 
   const items = [];
 
-  for (const surface of projectedSurfaces) {
+  for (const surface of actualProjectedSurfaces) {
     const points = surface.vertices.map((v) => ({
       x: v.x * scale + width / 2,
       y: -v.y * scale + height / 2,
@@ -363,6 +390,7 @@ export const CubicShapeEditor = (props: CubicShapeEditorProps) => {
         onMouseDown={onMouseDown}
         onMouseMove={onMouseMove}
         onMouseUp={onMouseUp}
+        onMouseLeave={onMouseLeave}
         onWheel={onWheel}
         onContextMenu={(e) => e.preventDefault()}
       >
