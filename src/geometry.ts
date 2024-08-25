@@ -119,6 +119,10 @@ export class Camera {
     const axis = mouseVec.cross(this.cameraDir);
     const angle = Math.sqrt(dx * dx + dy * dy) * scale;
 
+    if (Math.abs(angle) < 1e-8) {
+      return this;
+    }
+
     const newCameraDir = this.cameraDir.rotateAround(axis, angle);
     const newCameraUp = this.cameraUp.rotateAround(axis, angle);
 
