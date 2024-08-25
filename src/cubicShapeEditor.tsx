@@ -321,6 +321,18 @@ export const CubicShapeEditor = (props: CubicShapeEditorProps) => {
     setCameraOnMouseDown(null);
   };
 
+  useEffect(() => {
+    const onKeyUpdate = (e: KeyboardEvent) => {
+      setIsDeleteMode(e.ctrlKey);
+    };
+    window.addEventListener("keydown", onKeyUpdate);
+    window.addEventListener("keyup", onKeyUpdate);
+    return () => {
+      window.removeEventListener("keydown", onKeyUpdate);
+      window.removeEventListener("keyup", onKeyUpdate);
+    };
+  }, []);
+
   const onMouseLeave = () => {
     setCameraOnMouseDown(null);
     setMouseX(-1);
