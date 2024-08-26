@@ -39,7 +39,7 @@ const LayerwiseAnswerBoard = (props: {
 
     items.push(
       <rect
-        key="background"
+        key={`background,${z}`}
         x={margin}
         y={yOffset + margin}
         width={dims[2] * gridSize}
