@@ -15,111 +15,120 @@ const getColor = (id: number) => {
   return `hsl(${(id % 12) * 30}, ${100 - (Math.floor(id / 12) % 2) * 50}%, 80%)`;
 };
 
-const PlanarAnswerBoard = (props: {
+const LayerwiseAnswerBoard = (props: {
   answer: Answer;
-  height: number;
-  width: number;
+  dims: [number, number, number];
   gridSize: number;
 }) => {
   // TODO: better coloring
-  const { answer, height, width, gridSize } = props;
+  const { answer, dims, gridSize } = props;
   const answerData = answer.data;
 
   const margin = 5;
-  const svgHeight = height * gridSize + margin * 2;
-  const svgWidth = width * gridSize + margin * 2;
+  const svgHeight = ((dims[1] + 0.5) * dims[0] - 0.5) * gridSize + margin * 2;
+  const svgWidth = dims[2] * gridSize + margin * 2;
 
   const items = [];
 
-  items.push(
-    <rect
-      key="background"
-      x={margin}
-      y={margin}
-      width={width * gridSize}
-      height={height * gridSize}
-      fill="#eeeeee"
-    />,
-  );
+  const height = dims[1];
+  const width = dims[2];
 
-  for (let y = 0; y < height; ++y) {
-    for (let x = 0; x < width; ++x) {
-      const item = answerData[y * width + x];
+  for (let z = 0; z < dims[0]; ++z) {
+    const start = z * width * height;
+    const yOffset = (dims[0] - 1 - z) * (height + 0.5) * gridSize;
 
-      if (item[0] < 0) continue;
+    items.push(
+      <rect
+        key="background"
+        x={margin}
+        y={yOffset + margin}
+        width={dims[2] * gridSize}
+        height={dims[1] * gridSize}
+        fill="#eeeeee"
+      />,
+    );
 
-      items.push(
-        <rect
-          key={`${y},${x}`}
-          x={x * gridSize + margin}
-          y={y * gridSize + margin}
-          width={gridSize}
-          height={gridSize}
-          fill={getColor(item[0])}
-          stroke="#888888"
-        />,
-      );
-    }
-  }
+    for (let y = 0; y < height; ++y) {
+      for (let x = 0; x < width; ++x) {
+        const item = answerData[start + y * width + x];
 
-  const thickBorderWidth = 3;
+        if (item[0] < 0) continue;
 
-  for (let y = 0; y < height; ++y) {
-    for (let x = 0; x <= width; ++x) {
-      let hasWall = false;
-
-      if (x == 0) {
-        hasWall = answerData[y * width][0] >= 0;
-      } else if (x == width) {
-        hasWall = answerData[y * width + width - 1][0] >= 0;
-      } else {
-        const a = answerData[y * width + x - 1];
-        const b = answerData[y * width + x];
-        hasWall = a[0] !== b[0] || a[1] !== b[1];
-      }
-
-      if (hasWall) {
         items.push(
-          <line
-            key={`v${y},${x}`}
-            x1={x * gridSize + margin}
-            y1={y * gridSize + margin - thickBorderWidth * 0.5}
-            x2={x * gridSize + margin}
-            y2={(y + 1) * gridSize + margin + thickBorderWidth * 0.5}
-            strokeWidth={thickBorderWidth}
-            stroke="#333333"
+          <rect
+            key={`${z},${y},${x}`}
+            x={x * gridSize + margin}
+            y={yOffset + y * gridSize + margin}
+            width={gridSize}
+            height={gridSize}
+            fill={getColor(item[0])}
+            stroke="#888888"
           />,
         );
       }
     }
-  }
 
-  for (let y = 0; y <= height; ++y) {
-    for (let x = 0; x < width; ++x) {
-      let hasWall = false;
+    const thickBorderWidth = 3;
 
-      if (y == 0) {
-        hasWall = answerData[x][0] >= 0;
-      } else if (y == height) {
-        hasWall = answerData[(height - 1) * width + x][0] >= 0;
-      } else {
-        const a = answerData[(y - 1) * width + x];
-        const b = answerData[y * width + x];
-        hasWall = a[0] !== b[0] || a[1] !== b[1];
+    for (let y = 0; y < height; ++y) {
+      for (let x = 0; x <= width; ++x) {
+        let hasWall = false;
+
+        if (x == 0) {
+          hasWall = answerData[start + y * width][0] >= 0;
+        } else if (x == width) {
+          hasWall = answerData[start + y * width + width - 1][0] >= 0;
+        } else {
+          const a = answerData[start + y * width + x - 1];
+          const b = answerData[start + y * width + x];
+          hasWall = a[0] !== b[0] || a[1] !== b[1];
+        }
+
+        if (hasWall) {
+          items.push(
+            <line
+              key={`v${z},${y},${x}`}
+              x1={x * gridSize + margin}
+              y1={yOffset + y * gridSize + margin - thickBorderWidth * 0.5}
+              x2={x * gridSize + margin}
+              y2={
+                yOffset + (y + 1) * gridSize + margin + thickBorderWidth * 0.5
+              }
+              strokeWidth={thickBorderWidth}
+              stroke="#333333"
+            />,
+          );
+        }
       }
+    }
 
-      if (hasWall) {
-        items.push(
-          <line
-            key={`h${y},${x}`}
-            x1={x * gridSize + margin - thickBorderWidth * 0.5}
-            y1={y * gridSize + margin}
-            x2={(x + 1) * gridSize + margin + thickBorderWidth * 0.5}
-            y2={y * gridSize + margin}
-            strokeWidth={thickBorderWidth}
-            stroke="#333333"
-          />,
-        );
+    for (let y = 0; y <= height; ++y) {
+      for (let x = 0; x < width; ++x) {
+        let hasWall = false;
+
+        if (y == 0) {
+          hasWall = answerData[start + x][0] >= 0;
+        } else if (y == height) {
+          hasWall = answerData[start + (height - 1) * width + x][0] >= 0;
+        } else {
+          const a = answerData[start + (y - 1) * width + x];
+          const b = answerData[start + y * width + x];
+          hasWall = a[0] !== b[0] || a[1] !== b[1];
+        }
+
+        if (hasWall) {
+          items.push(
+            <line
+              key={`h${z},${y},${x}`}
+              x1={x * gridSize + margin - thickBorderWidth * 0.5}
+              y1={yOffset + y * gridSize + margin}
+              x2={(x + 1) * gridSize + margin + thickBorderWidth * 0.5}
+              y2={yOffset + y * gridSize + margin}
+              strokeWidth={thickBorderWidth}
+              stroke="#333333"
+            />,
+          );
+        }
       }
     }
   }
@@ -246,17 +255,20 @@ export const SolverPanel = (props: SolverPanelProps) => {
           </Typography>
         )}
       </Toolbar>
-      <Box sx={{ height: "320px" }}>
+      <Box sx={{ height: "320px", overflowY: "scroll" }}>
         {answerState !== undefined && answerState.answers.len() === 0 && (
           <Box>
             <Typography color="error">No solution</Typography>
           </Box>
         )}
         {answerState !== undefined && answerState.answers.len() > 0 && (
-          <PlanarAnswerBoard
+          <LayerwiseAnswerBoard
             answer={answerState.answers.get(actualIndex)}
-            height={answerState.board[0].length}
-            width={answerState.board[0][0].length}
+            dims={[
+              answerState.board.length,
+              answerState.board[0].length,
+              answerState.board[0][0].length,
+            ]}
             gridSize={32}
           />
         )}
