@@ -17,11 +17,12 @@ const getColor = (id: number) => {
 
 const LayerwiseAnswerBoard = (props: {
   answer: Answer;
+  pieceCounts: number[];
   dims: [number, number, number];
   gridSize: number;
 }) => {
   // TODO: better coloring
-  const { answer, dims, gridSize } = props;
+  const { answer, pieceCounts, dims, gridSize } = props;
   const answerData = answer.data;
 
   const margin = 5;
@@ -32,6 +33,16 @@ const LayerwiseAnswerBoard = (props: {
 
   const height = dims[1];
   const width = dims[2];
+
+  const cumulativePieceIds = [];
+  let cumulativePieceId = 0;
+  for (let i = 0; i < pieceCounts.length; ++i) {
+    const ids = [];
+    for (let j = 0; j < pieceCounts[i]; ++j) {
+      ids.push(cumulativePieceId++);
+    }
+    cumulativePieceIds.push(ids);
+  }
 
   for (let z = 0; z < dims[0]; ++z) {
     const start = z * width * height;
@@ -53,6 +64,7 @@ const LayerwiseAnswerBoard = (props: {
         const item = answerData[start + y * width + x];
 
         if (item[0] < 0) continue;
+        const pieceId = cumulativePieceIds[item[0]][item[1]];
 
         items.push(
           <rect
@@ -61,7 +73,7 @@ const LayerwiseAnswerBoard = (props: {
             y={yOffset + y * gridSize + margin}
             width={gridSize}
             height={gridSize}
-            fill={getColor(item[0])}
+            fill={getColor(pieceId)}
             stroke="#888888"
           />,
         );
@@ -150,18 +162,20 @@ export const SolverPanel = (props: SolverPanelProps) => {
 
   const [index, setIndex] = useState(0);
   const [answerState, setAnswerState] = useState<
-    { answers: Answers; board: number[][][] } | undefined
+    { answers: Answers; pieceCounts: number[]; board: number[][][] } | undefined
   >(undefined);
 
   const onSolve = () => {
+    const pieceShapes = pieces.map((p) => p.shape);
+    const pieceCounts = pieces.map((p) => p.count);
     const problem = {
-      pieces: pieces.map((p) => p.shape),
-      piece_count: pieces.map((p) => p.count),
+      pieces: pieceShapes,
+      piece_count: pieceCounts,
       board,
     };
     const answers = solve(problem);
 
-    setAnswerState({ answers, board });
+    setAnswerState({ answers, pieceCounts, board });
     setIndex(0);
   };
 
@@ -264,6 +278,7 @@ export const SolverPanel = (props: SolverPanelProps) => {
         {answerState !== undefined && answerState.answers.len() > 0 && (
           <LayerwiseAnswerBoard
             answer={answerState.answers.get(actualIndex)}
+            pieceCounts={answerState.pieceCounts}
             dims={[
               answerState.board.length,
               answerState.board[0].length,
