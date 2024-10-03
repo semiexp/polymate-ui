@@ -11,8 +11,12 @@ import {
 } from "@mui/icons-material";
 import { Box, IconButton, Toolbar, Typography } from "@mui/material";
 
-const getColor = (id: number) => {
-  return `hsl(${(id % 12) * 30}, ${100 - (Math.floor(id / 12) % 2) * 50}%, 80%)`;
+const getColor = (id: number, selected: boolean) => {
+  if (selected) {
+    return `hsl(${(id % 12) * 30}, ${80 - (Math.floor(id / 12) % 2) * 40}%, 60%)`;
+  } else {
+    return `hsl(${(id % 12) * 30}, ${100 - (Math.floor(id / 12) % 2) * 50}%, 80%)`;
+  }
 };
 
 const LayerwiseAnswerBoard = (props: {
@@ -44,6 +48,8 @@ const LayerwiseAnswerBoard = (props: {
     cumulativePieceIds.push(ids);
   }
 
+  const [selectedPieceId, setSelectedPieceId] = useState<number | null>(null);
+
   for (let z = 0; z < dims[0]; ++z) {
     const start = z * width * height;
     const yOffset = (dims[0] - 1 - z) * (height + 0.5) * gridSize;
@@ -73,7 +79,9 @@ const LayerwiseAnswerBoard = (props: {
             y={yOffset + y * gridSize + margin}
             width={gridSize}
             height={gridSize}
-            fill={getColor(pieceId)}
+            fill={getColor(pieceId, pieceId === selectedPieceId)}
+            onMouseOver={() => setSelectedPieceId(pieceId)}
+            onMouseOut={() => setSelectedPieceId(null)}
             stroke="#888888"
           />,
         );
