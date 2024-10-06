@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { solve, Answer, Answers } from "./Solver";
 import { DetailedPiece } from "./shape";
-import { CubicShapeManipulator } from "./cubicShapeManipulator";
+import { CubicShapeManipulator, PointedCube } from "./cubicShapeManipulator";
 import {
   KeyboardArrowLeft,
   KeyboardArrowRight,
@@ -12,11 +12,12 @@ import {
 } from "@mui/icons-material";
 import { Box, IconButton, Tab, Tabs, Toolbar, Typography } from "@mui/material";
 
-const getColor = (id: number, selected: boolean) => {
+const getColor = (id: number, selected: boolean, translucent?: boolean) => {
+  let alpha = translucent ? 0.3 : 1.0;
   if (selected) {
-    return `hsl(${(id % 12) * 30}, ${80 - (Math.floor(id / 12) % 2) * 40}%, 60%)`;
+    return `hsla(${(id % 12) * 30}, ${80 - (Math.floor(id / 12) % 2) * 40}%, 60%, ${alpha})`;
   } else {
-    return `hsl(${(id % 12) * 30}, ${100 - (Math.floor(id / 12) % 2) * 50}%, 80%)`;
+    return `hsla(${(id % 12) * 30}, ${100 - (Math.floor(id / 12) % 2) * 50}%, 80%, ${alpha})`;
   }
 };
 
@@ -169,7 +170,7 @@ const CubicAnswerBoard = (props: {
   const { answer, pieceCounts, dims } = props;
   const answerData = answer.data;
 
-  const cumulativePieceIds = [];
+  const cumulativePieceIds: number[][] = [];
   let cumulativePieceId = 0;
   for (let i = 0; i < pieceCounts.length; ++i) {
     const ids = [];
@@ -178,6 +179,14 @@ const CubicAnswerBoard = (props: {
     }
     cumulativePieceIds.push(ids);
   }
+
+  const [isTranslucent, setIsTranslucent] = useState(
+    new Array(cumulativePieceId).fill(false),
+  );
+
+  useEffect(() => {
+    setIsTranslucent(new Array(cumulativePieceId).fill(false));
+  }, [answer]);
 
   const cubes = [];
   for (let i = 0; i < dims[0]; ++i) {
@@ -188,13 +197,27 @@ const CubicAnswerBoard = (props: {
         const pieceId = cumulativePieceIds[item[0]][item[1]];
         cubes.push({
           coord: { x: k, y: j, z: i },
-          color: getColor(pieceId, false),
+          color: getColor(pieceId, false, isTranslucent[pieceId]),
         });
       }
     }
   }
 
-  return <CubicShapeManipulator cubes={cubes} />;
+  const onClick = (pointed?: PointedCube) => {
+    if (pointed) {
+      const cube = pointed.cube;
+      const item =
+        answerData[cube.z * dims[1] * dims[2] + cube.y * dims[2] + cube.x];
+      if (item[0] < 0) return;
+
+      const pieceId = cumulativePieceIds[item[0]][item[1]];
+      const newTranslucent = [...isTranslucent];
+      newTranslucent[pieceId] = !newTranslucent[pieceId];
+      setIsTranslucent(newTranslucent);
+    }
+  };
+
+  return <CubicShapeManipulator cubes={cubes} onClick={onClick} />;
 };
 
 export type SolverPanelProps = {
@@ -317,7 +340,7 @@ export const SolverPanel = (props: SolverPanelProps) => {
           </Typography>
         )}
       </Toolbar>
-      <Box sx={{ height: "320px", overflowY: "scroll" }}>
+      <Box sx={{ height: "400px" }}>
         {answerState !== undefined && answerState.answers.len() === 0 && (
           <Box>
             <Typography color="error">No solution</Typography>
@@ -347,16 +370,18 @@ export const SolverPanel = (props: SolverPanelProps) => {
               </Tabs>
             </Box>
             {tabValue === 0 && (
-              <LayerwiseAnswerBoard
-                answer={answerState.answers.get(actualIndex)}
-                pieceCounts={answerState.pieceCounts}
-                dims={[
-                  answerState.board.length,
-                  answerState.board[0].length,
-                  answerState.board[0][0].length,
-                ]}
-                gridSize={32}
-              />
+              <Box sx={{ height: "100%", overflowY: "scroll" }}>
+                <LayerwiseAnswerBoard
+                  answer={answerState.answers.get(actualIndex)}
+                  pieceCounts={answerState.pieceCounts}
+                  dims={[
+                    answerState.board.length,
+                    answerState.board[0].length,
+                    answerState.board[0][0].length,
+                  ]}
+                  gridSize={32}
+                />
+              </Box>
             )}
             {tabValue === 1 && (
               <CubicAnswerBoard
