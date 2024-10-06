@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { solve, Answer, Answers } from "./Solver";
 import { DetailedPiece } from "./shape";
+import { CubicShapeManipulator } from "./cubicShapeManipulator";
 import {
   KeyboardArrowLeft,
   KeyboardArrowRight,
@@ -9,7 +10,7 @@ import {
   KeyboardDoubleArrowRight,
   Search,
 } from "@mui/icons-material";
-import { Box, IconButton, Toolbar, Typography } from "@mui/material";
+import { Box, IconButton, Tab, Tabs, Toolbar, Typography } from "@mui/material";
 
 const getColor = (id: number, selected: boolean) => {
   if (selected) {
@@ -160,6 +161,42 @@ const LayerwiseAnswerBoard = (props: {
   );
 };
 
+const CubicAnswerBoard = (props: {
+  answer: Answer;
+  pieceCounts: number[];
+  dims: [number, number, number];
+}) => {
+  const { answer, pieceCounts, dims } = props;
+  const answerData = answer.data;
+
+  const cumulativePieceIds = [];
+  let cumulativePieceId = 0;
+  for (let i = 0; i < pieceCounts.length; ++i) {
+    const ids = [];
+    for (let j = 0; j < pieceCounts[i]; ++j) {
+      ids.push(cumulativePieceId++);
+    }
+    cumulativePieceIds.push(ids);
+  }
+
+  const cubes = [];
+  for (let i = 0; i < dims[0]; ++i) {
+    for (let j = 0; j < dims[1]; ++j) {
+      for (let k = 0; k < dims[2]; ++k) {
+        const item = answerData[i * dims[1] * dims[2] + j * dims[2] + k];
+        if (item[0] < 0) continue;
+        const pieceId = cumulativePieceIds[item[0]][item[1]];
+        cubes.push({
+          coord: { x: k, y: j, z: i },
+          color: getColor(pieceId, false),
+        });
+      }
+    }
+  }
+
+  return <CubicShapeManipulator cubes={cubes} />;
+};
+
 export type SolverPanelProps = {
   pieces: DetailedPiece[];
   board: number[][][];
@@ -206,6 +243,9 @@ export const SolverPanel = (props: SolverPanelProps) => {
       setIndex(answerState.answers.len() - 1);
     }
   };
+
+  const [tabValue, setTabValue] = useState(0);
+
   return (
     <Box
       sx={{
@@ -284,16 +324,52 @@ export const SolverPanel = (props: SolverPanelProps) => {
           </Box>
         )}
         {answerState !== undefined && answerState.answers.len() > 0 && (
-          <LayerwiseAnswerBoard
-            answer={answerState.answers.get(actualIndex)}
-            pieceCounts={answerState.pieceCounts}
-            dims={[
-              answerState.board.length,
-              answerState.board[0].length,
-              answerState.board[0][0].length,
-            ]}
-            gridSize={32}
-          />
+          <Box
+            sx={{
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              flexFlow: "column",
+            }}
+          >
+            <Box
+              sx={{
+                borderBottom: 1,
+                borderColor: "divider",
+                flexGrow: 0,
+                flexShrink: 1,
+                flexBasis: "auto",
+              }}
+            >
+              <Tabs value={tabValue} onChange={(_e, v) => setTabValue(v)}>
+                <Tab label="Layerwise" />
+                <Tab label="Cubic" />
+              </Tabs>
+            </Box>
+            {tabValue === 0 && (
+              <LayerwiseAnswerBoard
+                answer={answerState.answers.get(actualIndex)}
+                pieceCounts={answerState.pieceCounts}
+                dims={[
+                  answerState.board.length,
+                  answerState.board[0].length,
+                  answerState.board[0][0].length,
+                ]}
+                gridSize={32}
+              />
+            )}
+            {tabValue === 1 && (
+              <CubicAnswerBoard
+                answer={answerState.answers.get(actualIndex)}
+                pieceCounts={answerState.pieceCounts}
+                dims={[
+                  answerState.board.length,
+                  answerState.board[0].length,
+                  answerState.board[0][0].length,
+                ]}
+              />
+            )}
+          </Box>
         )}
       </Box>
     </Box>
