@@ -198,6 +198,7 @@ const CubicAnswerBoard = (props: {
         cubes.push({
           coord: { x: k, y: j, z: i },
           color: getColor(pieceId, false, isTranslucent[pieceId]),
+          id: pieceId,
         });
       }
     }

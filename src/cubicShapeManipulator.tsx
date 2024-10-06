@@ -26,9 +26,18 @@ const neighbors = [
 ];
 
 const enumerateSurfaces = (
-  cubes: { coord: Coord; color: string }[],
+  cubes: { coord: Coord; color: string; id?: number }[],
 ): Surface<ExtraInfo>[] => {
   const surfaces: Surface<ExtraInfo>[] = [];
+
+  const coordToId = new Map<string, number>();
+
+  for (let i = 0; i < cubes.length; ++i) {
+    const c = cubes[i];
+    if (c.id !== undefined) {
+      coordToId.set(`${c.coord.x},${c.coord.y},${c.coord.z}`, c.id);
+    }
+  }
 
   const maybeAddSurface = (cube: Coord, anotherCube: Coord, color: string) => {
     const x = Math.max(cube.x, anotherCube.x);
@@ -37,6 +46,19 @@ const enumerateSurfaces = (
     const dx = Math.abs(anotherCube.x - cube.x);
     const dy = Math.abs(anotherCube.y - cube.y);
     const dz = Math.abs(anotherCube.z - cube.z);
+
+    const cubeId = coordToId.get(`${cube.x},${cube.y},${cube.z}`);
+    const anotherCubeId = coordToId.get(
+      `${anotherCube.x},${anotherCube.y},${anotherCube.z}`,
+    );
+
+    if (
+      cubeId !== undefined &&
+      anotherCubeId !== undefined &&
+      cubeId === anotherCubeId
+    ) {
+      return;
+    }
 
     const vertices = [
       new Vector3(x, y, z),
