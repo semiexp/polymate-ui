@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useRef, useState } from "react";
+import { useState } from "react";
 
 import { Add } from "@mui/icons-material";
 import {
@@ -8,7 +8,6 @@ import {
   Typography,
   IconButton,
   Button,
-  Dialog,
   DialogTitle,
   DialogActions,
   DialogContent,
@@ -17,7 +16,9 @@ import {
 
 import { ShapePreview } from "./ShapePreview";
 import { ShapeEditor } from "./ShapeEditor";
-import { Shape, DetailedPiece, isEmpty } from "./shape";
+import { DetailedPiece, isEmpty } from "./shape";
+
+import { openDialog, AutoMuiDialog } from "./dialog";
 
 export type PiecesManagerProps = {
   pieces: DetailedPiece[];
@@ -25,12 +26,10 @@ export type PiecesManagerProps = {
 };
 
 export const PiecesManager = (props: PiecesManagerProps) => {
-  const pieceEditorDialogRef = useRef<PieceEditorDialogRefType>(null);
-
   const { pieces, onChange } = props;
 
   const onEditPiece = async (index: number) => {
-    const newShape = await pieceEditorDialogRef.current!.open(pieces[index]);
+    const newShape = await openDialog(PieceEditorDialog, pieces[index]);
     if (newShape) {
       const newShapes = [];
       for (let i = 0; i < pieces.length; ++i) {
@@ -41,7 +40,7 @@ export const PiecesManager = (props: PiecesManagerProps) => {
   };
 
   const onAddPiece = async () => {
-    const newShape = await pieceEditorDialogRef.current!.open({
+    const newShape = await openDialog(PieceEditorDialog, {
       shape: [[[1]]],
       count: 1,
     });
@@ -109,79 +108,40 @@ export const PiecesManager = (props: PiecesManagerProps) => {
           ))}
         </Grid>
       </Box>
-      <PieceEditorDialog ref={pieceEditorDialogRef} />
     </Box>
   );
 };
 
-type PieceDialogState = {
-  open: boolean;
-  isEmptyError: boolean;
-  shape: Shape;
-  count: number;
-  callback?: (value?: DetailedPiece) => void;
-};
+type PieceEditorDialogType = { shape: number[][][]; count: number };
 
-type PieceEditorDialogRefType = {
-  open(initialPiece: DetailedPiece): Promise<DetailedPiece | undefined>;
-};
+const PieceEditorDialog = (props: {
+  initialValues: PieceEditorDialogType;
+  close: (value?: PieceEditorDialogType) => void;
+}) => {
+  const { initialValues, close } = props;
+  const [isEmptyError, setIsEmptyError] = useState(false);
 
-const PieceEditorDialog = forwardRef((_props, ref) => {
-  const [state, setState] = useState<PieceDialogState>({
-    open: false,
-    isEmptyError: false,
-    shape: [[[0]]],
-    count: 1,
-  });
-
-  useImperativeHandle(ref, () => {
-    return {
-      open(initialPiece: DetailedPiece): Promise<DetailedPiece | undefined> {
-        return new Promise((resolve: (value?: DetailedPiece) => void) => {
-          setState({
-            open: true,
-            isEmptyError: false,
-            shape: initialPiece.shape,
-            count: initialPiece.count,
-            callback: resolve,
-          });
-        });
-      },
-    };
-  });
-
-  const onClick = (ok: boolean) => {
-    if (ok && isEmpty(state.shape)) {
-      setState({ ...state, isEmptyError: true });
-      return;
-    }
-
-    state.callback!(
-      ok ? { shape: state.shape, count: state.count } : undefined,
-    );
-    setState({ open: false, isEmptyError: false, shape: [[[0]]], count: 1 });
-  };
-
+  const [values, setValues] = useState(initialValues);
   const onChangeCount = (e: React.ChangeEvent<HTMLInputElement>) => {
     const n = parseInt(e.target.value);
     if (isNaN(n) || n < 1) {
       return;
     }
-    setState({ ...state, count: n });
+    setValues({ ...values, count: n });
   };
 
   return (
-    <Dialog open={state.open}>
+    <AutoMuiDialog>
       <DialogTitle>Edit Piece</DialogTitle>
       <DialogContent>
         <Box sx={{ height: "320px" }}>
           <ShapeEditor
-            shape={state.shape}
-            onChange={(shape) => setState({ ...state, shape })}
+            shape={values.shape}
+            onChange={(shape) => setValues({ ...values, shape })}
             planarGridSize={32}
           />
         </Box>
-        {state.isEmptyError && (
+        {isEmptyError && (
           <Typography color="error">Piece must not be empty</Typography>
         )}
         <TextField
@@ -191,14 +151,24 @@ const PieceEditorDialog = forwardRef((_props, ref) => {
           sx={{ mt: 2 }}
           inputProps={{ min: 1 }}
           variant="standard"
-          value={state.count}
+          value={values.count}
           onChange={onChangeCount}
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => onClick(false)}>Cancel</Button>
-        <Button onClick={() => onClick(true)}>OK</Button>
+        <Button onClick={() => close()}>Cancel</Button>
+        <Button
+          onClick={() => {
+            if (isEmpty(values.shape)) {
+              setIsEmptyError(true);
+              return;
+            }
+            close(values);
+          }}
+        >
+          OK
+        </Button>
       </DialogActions>
-    </Dialog>
+    </AutoMuiDialog>
   );
-});
+};
