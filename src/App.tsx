@@ -9,8 +9,13 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  DialogTitle,
+  DialogActions,
+  DialogContent,
+  TextField,
+  Button,
 } from "@mui/material";
-import { ExpandMore, Menu as MenuIcon } from "@mui/icons-material";
+import { ExpandMore, GridOn, Menu as MenuIcon } from "@mui/icons-material";
 import AppBar from "@mui/material/AppBar";
 import Container from "@mui/material/Container";
 import Toolbar from "@mui/material/Toolbar";
@@ -20,6 +25,7 @@ import { PiecesManager } from "./PiecesManager";
 import { ShapeEditor } from "./ShapeEditor";
 import { SolverPanel } from "./SolverPanel";
 import { presets } from "./Presets";
+import { openDialog, AutoMuiDialog } from "./dialog";
 import { DetailedPiece } from "./shape";
 // import "./App.css";
 
@@ -53,6 +59,24 @@ function App() {
     setShapeEditorGeneration(shapeEditorGeneration ^ 1);
     setAnchorEl(null);
   };
+  const onNewBoard = async () => {
+    const newBoardShape = await openDialog(PieceEditorDialog, {
+      width: 1,
+      height: 1,
+      depth: 1,
+    });
+    if (newBoardShape !== undefined) {
+      setBoard(
+        Array.from({ length: newBoardShape.depth }, () =>
+          Array.from({ length: newBoardShape.height }, () =>
+            Array.from({ length: newBoardShape.width }, () => 1),
+          ),
+        ),
+      );
+      setShapeEditorGeneration(shapeEditorGeneration ^ 1);
+    }
+  };
+
   const onUsePreset = (presetIdx: number) => {
     console.log(presets[presetIdx].board);
     setBoard(presets[presetIdx].board);
@@ -104,6 +128,15 @@ function App() {
               <Typography variant="h6" color="inherit" component="div">
                 Board
               </Typography>
+              <IconButton
+                size="small"
+                edge="start"
+                color="inherit"
+                sx={{ marginLeft: "auto" }}
+                onClick={onNewBoard}
+              >
+                <GridOn />
+              </IconButton>
             </Toolbar>
             <Box sx={{ height: "320px" }}>
               <ShapeEditor
@@ -151,5 +184,71 @@ function App() {
     </Container>
   );
 }
+
+type PieceEditorDialogType = { width: number; height: number; depth: number };
+
+const PieceEditorDialog = (props: {
+  initialValues: PieceEditorDialogType;
+  close: (value?: PieceEditorDialogType) => void;
+}) => {
+  const { initialValues, close } = props;
+  const [values, setValues] = useState(initialValues);
+
+  const onChange =
+    (key: keyof PieceEditorDialogType) =>
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const n = parseInt(e.target.value);
+      if (isNaN(n) || n < 1) {
+        return;
+      }
+      setValues({ ...values, [key]: n });
+    };
+
+  return (
+    <AutoMuiDialog>
+      <DialogTitle>New board</DialogTitle>
+      <DialogContent>
+        <Box sx={{ display: "grid", gridTemplateColumns: "1fr", gap: 2 }}>
+          <TextField
+            label="Width"
+            type="number"
+            InputLabelProps={{ shrink: true }}
+            sx={{ mt: 2 }}
+            inputProps={{ min: 1 }}
+            variant="standard"
+            value={values.width}
+            onChange={onChange("width")}
+          />
+
+          <TextField
+            label="Height"
+            type="number"
+            InputLabelProps={{ shrink: true }}
+            sx={{ mt: 2 }}
+            inputProps={{ min: 1 }}
+            variant="standard"
+            value={values.height}
+            onChange={onChange("height")}
+          />
+
+          <TextField
+            label="Depth"
+            type="number"
+            InputLabelProps={{ shrink: true }}
+            sx={{ mt: 2 }}
+            inputProps={{ min: 1 }}
+            variant="standard"
+            value={values.depth}
+            onChange={onChange("depth")}
+          />
+        </Box>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={() => close()}>Cancel</Button>
+        <Button onClick={() => close(values)}>OK</Button>
+      </DialogActions>
+    </AutoMuiDialog>
+  );
+};
 
 export default App;
