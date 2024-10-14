@@ -61,9 +61,9 @@ function App() {
   };
   const onNewBoard = async () => {
     const newBoardShape = await openDialog(PieceEditorDialog, {
-      width: 1,
-      height: 1,
-      depth: 1,
+      width: board[0][0].length,
+      height: board[0].length,
+      depth: board.length,
     });
     if (newBoardShape !== undefined) {
       setBoard(
