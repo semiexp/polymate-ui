@@ -3,6 +3,7 @@ import { createElement, createContext, useContext, useState } from "react";
 import { createRoot } from "react-dom/client";
 
 const dialogRoots = new Map();
+const dialogKey = new Map();
 const DialogOpenStateContext = createContext(false);
 
 const DialogWrapper = <T,>(props: {
@@ -37,19 +38,24 @@ export const openDialog = <T,>(
   initialValues: T,
 ): Promise<T | undefined> => {
   if (!dialogRoots.has(dialogImpl)) {
-    const newRoot = document.createElement("div");
-    document.body.appendChild(newRoot);
+    const newRootElem = document.createElement("div");
+    document.body.appendChild(newRootElem);
+    const newRoot = createRoot(newRootElem);
     dialogRoots.set(dialogImpl, newRoot);
+    dialogKey.set(dialogImpl, 0);
   }
 
   const dialogRoot = dialogRoots.get(dialogImpl)!;
+  const key = dialogKey.get(dialogImpl)!;
+  dialogKey.set(dialogImpl, key ^ 1);
 
   return new Promise((resolve) => {
-    createRoot(dialogRoot).render(
+    dialogRoot.render(
       <DialogWrapper
         dialogImpl={dialogImpl}
         initialValues={initialValues}
         resolve={resolve}
+        key={`${key}`}
       />,
     );
   });
