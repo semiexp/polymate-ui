@@ -112,6 +112,34 @@ export const PiecesManager = (props: PiecesManagerProps) => {
   );
 };
 
+const toPlanarPiece = (shape: number[][][]) => {
+  if (shape.length === 1) {
+    return shape;
+  } else if (shape[0].length === 1) {
+    const flat = [];
+    for (let i = 0; i < shape.length; ++i) {
+      const row = [];
+      for (let j = 0; j < shape[i][0].length; ++j) {
+        row.push(shape[i][0][j]);
+      }
+      flat.push(row);
+    }
+    return [flat];
+  } else if (shape[0][0].length === 1) {
+    const flat = [];
+    for (let i = 0; i < shape.length; ++i) {
+      const row = [];
+      for (let j = 0; j < shape[i].length; ++j) {
+        row.push(shape[i][j][0]);
+      }
+      flat.push(row);
+    }
+    return [flat];
+  } else {
+    return shape; // not planar
+  }
+};
+
 type PieceEditorDialogType = { shape: number[][][]; count: number };
 
 const PieceEditorDialog = (props: {
@@ -163,7 +191,11 @@ const PieceEditorDialog = (props: {
               setIsEmptyError(true);
               return;
             }
-            close(values);
+            const ret = {
+              shape: toPlanarPiece(values.shape),
+              count: values.count,
+            };
+            close(ret);
           }}
         >
           OK

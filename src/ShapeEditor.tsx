@@ -10,9 +10,37 @@ type ShapeEditorProps = {
   planarGridSize: number;
 };
 
+const toPlanarShape = (shape: number[][][]) => {
+  if (shape.length === 1) {
+    return shape;
+  } else if (shape[0].length === 1) {
+    const flat = [];
+    for (let i = 0; i < shape.length; ++i) {
+      const row = [];
+      for (let j = 0; j < shape[i][0].length; ++j) {
+        row.push(shape[i][0][j]);
+      }
+      flat.push(row);
+    }
+    return [flat];
+  } else if (shape[0][0].length === 1) {
+    const flat = [];
+    for (let i = 0; i < shape.length; ++i) {
+      const row = [];
+      for (let j = 0; j < shape[i].length; ++j) {
+        row.push(shape[i][j][0]);
+      }
+      flat.push(row);
+    }
+    return [flat];
+  } else {
+    return shape; // not planar
+  }
+};
+
 export const ShapeEditor = (props: ShapeEditorProps) => {
-  const [tabValue, setTabValue] = useState(0);
   const { shape, onChange } = props;
+  const [tabValue, setTabValue] = useState(shape.length === 1 ? 0 : 1);
 
   return (
     <Box
@@ -33,7 +61,7 @@ export const ShapeEditor = (props: ShapeEditorProps) => {
         }}
       >
         <Tabs value={tabValue} onChange={(_e, v) => setTabValue(v)}>
-          <Tab label="Planar" />
+          <Tab label="Planar" disabled={shape.length !== 1} />
           <Tab label="Cubic" />
           <Tab label="Layerwise" disabled />
         </Tabs>
@@ -48,7 +76,12 @@ export const ShapeEditor = (props: ShapeEditorProps) => {
         />
       )}
       {tabValue === 1 && (
-        <CubicShapeEditor initialShape={shape} onChange={onChange} />
+        <CubicShapeEditor
+          initialShape={shape}
+          onChange={(s) => {
+            onChange(toPlanarShape(s));
+          }}
+        />
       )}
     </Box>
   );
