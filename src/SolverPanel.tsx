@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 
-import { solveAsync, getAnswerAsync, Answer } from "./Solver";
+import { solveAsync, getAnswerAsync, terminateWorker, Answer } from "./Solver";
 import { DetailedPiece } from "./shape";
 import { CubicShapeManipulator, PointedCube } from "./cubicShapeManipulator";
 import {
+  Cancel,
   KeyboardArrowLeft,
   KeyboardArrowRight,
   KeyboardDoubleArrowLeft,
@@ -256,6 +257,11 @@ export const SolverPanel = (props: SolverPanelProps) => {
   };
 
   const onSolve = async () => {
+    if (isRunning) {
+      terminateWorker();
+      return;
+    }
+
     const pieceShapes = pieces.map((p) => p.shape);
     const pieceCounts = pieces.map((p) => p.count);
     const problem = {
@@ -273,6 +279,9 @@ export const SolverPanel = (props: SolverPanelProps) => {
       setCurrentAnswer(null);
 
       await setIndexAndLoadAnswer(0);
+    } else {
+      setSolvedProblem(null);
+      setCurrentAnswer(null);
     }
   };
 
@@ -318,9 +327,8 @@ export const SolverPanel = (props: SolverPanelProps) => {
           color="inherit"
           sx={{ marginLeft: 1 }}
           onClick={onSolve}
-          disabled={isRunning}
         >
-          <Search />
+          {isRunning ? <Cancel /> : <Search />}
         </IconButton>
         <IconButton
           size="small"
