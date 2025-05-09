@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { solve, Answer, Answers } from "./Solver";
+import { solveAsync, getAnswerAsync, Answer } from "./Solver";
 import { DetailedPiece } from "./shape";
 import { CubicShapeManipulator, PointedCube } from "./cubicShapeManipulator";
 import {
@@ -10,10 +10,18 @@ import {
   KeyboardDoubleArrowRight,
   Search,
 } from "@mui/icons-material";
-import { Box, IconButton, Tab, Tabs, Toolbar, Typography } from "@mui/material";
+import {
+  Box,
+  CircularProgress,
+  IconButton,
+  Tab,
+  Tabs,
+  Toolbar,
+  Typography,
+} from "@mui/material";
 
 const getColor = (id: number, selected: boolean, translucent?: boolean) => {
-  let alpha = translucent ? 0.3 : 1.0;
+  const alpha = translucent ? 0.3 : 1.0;
   if (selected) {
     return `hsla(${(id % 12) * 30}, ${80 - (Math.floor(id / 12) % 2) * 40}%, 60%, ${alpha})`;
   } else {
@@ -230,11 +238,24 @@ export const SolverPanel = (props: SolverPanelProps) => {
   const { pieces, board } = props;
 
   const [index, setIndex] = useState(0);
-  const [answerState, setAnswerState] = useState<
-    { answers: Answers; pieceCounts: number[]; board: number[][][] } | undefined
-  >(undefined);
+  const [solvedProblem, setSolvedProblem] = useState<{
+    numAnswers: number;
+    pieceCounts: number[];
+    board: number[][][];
+  } | null>(null);
+  const [isRunning, setIsRunning] = useState(false);
+  const [currentAnswer, setCurrentAnswer] = useState<Answer | null>(null);
 
-  const onSolve = () => {
+  const setIndexAndLoadAnswer = async (index: number) => {
+    const ans = await getAnswerAsync(index);
+    if (ans === null) {
+      return;
+    }
+    setCurrentAnswer(ans);
+    setIndex(index);
+  };
+
+  const onSolve = async () => {
     const pieceShapes = pieces.map((p) => p.shape);
     const pieceCounts = pieces.map((p) => p.count);
     const problem = {
@@ -242,29 +263,36 @@ export const SolverPanel = (props: SolverPanelProps) => {
       piece_count: pieceCounts,
       board,
     };
-    const answers = solve(problem);
 
-    setAnswerState({ answers, pieceCounts, board });
-    setIndex(0);
+    setIsRunning(true);
+    const answers = await solveAsync(problem);
+    setIsRunning(false);
+
+    if (answers.status === "ok") {
+      setSolvedProblem({ numAnswers: answers.numAnswers, pieceCounts, board });
+      setCurrentAnswer(null);
+
+      await setIndexAndLoadAnswer(0);
+    }
   };
 
   const actualIndex =
-    answerState !== undefined
-      ? Math.min(index, answerState.answers.len() - 1)
-      : 0;
+    solvedProblem !== null ? Math.min(index, solvedProblem.numAnswers - 1) : 0;
 
-  const updateIndex = (mode: number) => {
-    if (answerState === undefined) {
+  const updateIndex = async (mode: number) => {
+    if (solvedProblem === null) {
       return;
     }
     if (mode === -2) {
-      setIndex(0);
+      await setIndexAndLoadAnswer(0);
     } else if (mode === -1) {
-      setIndex(Math.max(actualIndex - 1, 0));
+      await setIndexAndLoadAnswer(Math.max(actualIndex - 1, 0));
     } else if (mode === 1) {
-      setIndex(Math.min(actualIndex + 1, answerState.answers.len() - 1));
+      await setIndexAndLoadAnswer(
+        Math.min(actualIndex + 1, solvedProblem.numAnswers - 1),
+      );
     } else if (mode === 2) {
-      setIndex(answerState.answers.len() - 1);
+      await setIndexAndLoadAnswer(solvedProblem.numAnswers - 1);
     }
   };
 
@@ -290,6 +318,7 @@ export const SolverPanel = (props: SolverPanelProps) => {
           color="inherit"
           sx={{ marginLeft: 1 }}
           onClick={onSolve}
+          disabled={isRunning}
         >
           <Search />
         </IconButton>
@@ -297,8 +326,10 @@ export const SolverPanel = (props: SolverPanelProps) => {
           size="small"
           edge="start"
           color="inherit"
-          disabled={answerState === undefined || actualIndex === 0}
-          onClick={() => updateIndex(-2)}
+          disabled={
+            solvedProblem === undefined || actualIndex === 0 || isRunning
+          }
+          onClick={async () => await updateIndex(-2)}
         >
           <KeyboardDoubleArrowLeft />
         </IconButton>
@@ -306,8 +337,10 @@ export const SolverPanel = (props: SolverPanelProps) => {
           size="small"
           edge="start"
           color="inherit"
-          disabled={answerState === undefined || actualIndex === 0}
-          onClick={() => updateIndex(-1)}
+          disabled={
+            solvedProblem === undefined || actualIndex === 0 || isRunning
+          }
+          onClick={async () => await updateIndex(-1)}
         >
           <KeyboardArrowLeft />
         </IconButton>
@@ -316,10 +349,11 @@ export const SolverPanel = (props: SolverPanelProps) => {
           edge="start"
           color="inherit"
           disabled={
-            answerState === undefined ||
-            actualIndex >= answerState.answers.len() - 1
+            solvedProblem === null ||
+            actualIndex >= solvedProblem.numAnswers - 1 ||
+            isRunning
           }
-          onClick={() => updateIndex(1)}
+          onClick={async () => await updateIndex(1)}
         >
           <KeyboardArrowRight />
         </IconButton>
@@ -328,26 +362,28 @@ export const SolverPanel = (props: SolverPanelProps) => {
           edge="start"
           color="inherit"
           disabled={
-            answerState === undefined ||
-            actualIndex >= answerState.answers.len() - 1
+            solvedProblem === null ||
+            actualIndex >= solvedProblem.numAnswers - 1 ||
+            isRunning
           }
-          onClick={() => updateIndex(2)}
+          onClick={async () => await updateIndex(2)}
         >
           <KeyboardDoubleArrowRight />
         </IconButton>
-        {answerState !== undefined && (
+        {solvedProblem !== null && (
           <Typography color="inherit" sx={{ marginLeft: 1 }}>
-            {actualIndex + 1} / {answerState.answers.len()}
+            {actualIndex + 1} / {solvedProblem.numAnswers}
           </Typography>
         )}
+        {isRunning && <CircularProgress />}
       </Toolbar>
       <Box sx={{ height: "400px" }}>
-        {answerState !== undefined && answerState.answers.len() === 0 && (
+        {solvedProblem !== null && solvedProblem.numAnswers === 0 && (
           <Box>
             <Typography color="error">No solution</Typography>
           </Box>
         )}
-        {answerState !== undefined && answerState.answers.len() > 0 && (
+        {solvedProblem !== null && solvedProblem.numAnswers > 0 && (
           <Box
             sx={{
               width: "100%",
@@ -370,28 +406,28 @@ export const SolverPanel = (props: SolverPanelProps) => {
                 <Tab label="Cubic" />
               </Tabs>
             </Box>
-            {tabValue === 0 && (
+            {tabValue === 0 && currentAnswer !== null && (
               <Box sx={{ height: "100%", overflowY: "scroll" }}>
                 <LayerwiseAnswerBoard
-                  answer={answerState.answers.get(actualIndex)}
-                  pieceCounts={answerState.pieceCounts}
+                  answer={currentAnswer}
+                  pieceCounts={solvedProblem.pieceCounts}
                   dims={[
-                    answerState.board.length,
-                    answerState.board[0].length,
-                    answerState.board[0][0].length,
+                    solvedProblem.board.length,
+                    solvedProblem.board[0].length,
+                    solvedProblem.board[0][0].length,
                   ]}
                   gridSize={32}
                 />
               </Box>
             )}
-            {tabValue === 1 && (
+            {tabValue === 1 && currentAnswer !== null && (
               <CubicAnswerBoard
-                answer={answerState.answers.get(actualIndex)}
-                pieceCounts={answerState.pieceCounts}
+                answer={currentAnswer}
+                pieceCounts={solvedProblem.pieceCounts}
                 dims={[
-                  answerState.board.length,
-                  answerState.board[0].length,
-                  answerState.board[0][0].length,
+                  solvedProblem.board.length,
+                  solvedProblem.board[0].length,
+                  solvedProblem.board[0][0].length,
                 ]}
               />
             )}
