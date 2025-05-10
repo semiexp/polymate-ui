@@ -111,9 +111,6 @@ function App() {
           >
             <LibraryBooksIcon />
           </IconButton>
-          <Typography variant="h6" color="inherit" component="div">
-            Polymate
-          </Typography>
         </Toolbar>
       </Box>
 
