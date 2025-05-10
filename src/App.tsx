@@ -47,17 +47,24 @@ function App() {
     setPresetMenuAnchorEl(null);
   };
 
-  const onNewProblem = () => {
-    // TODO: show confirmation dialog
-    setBoard([[[1]]]);
-    setPieces([
-      {
-        shape: [[[1]]],
-        count: 1,
-      },
-    ]);
-    setShapeEditorGeneration(shapeEditorGeneration ^ 1);
+  const onNewProblem = async () => {
+    const result = await openDialog(ConfirmationDialog, {
+      message:
+        "Are you sure you want to reset the problem? This action cannot be undone.",
+    });
+
+    if (result !== undefined) {
+      setBoard([[[1]]]);
+      setPieces([
+        {
+          shape: [[[1]]],
+          count: 1,
+        },
+      ]);
+      setShapeEditorGeneration(shapeEditorGeneration ^ 1);
+    }
   };
+
   const onNewBoard = async () => {
     const newBoardShape = await openDialog(PieceEditorDialog, {
       width: board[0][0].length,
@@ -232,6 +239,26 @@ const PieceEditorDialog = (props: {
       <DialogActions>
         <Button onClick={() => close()}>Cancel</Button>
         <Button onClick={() => close(values)}>OK</Button>
+      </DialogActions>
+    </AutoMuiDialog>
+  );
+};
+
+const ConfirmationDialog = (props: {
+  initialValues: { message: string };
+  close: (values?: { message: string } | undefined) => void;
+}) => {
+  const { initialValues, close } = props;
+
+  return (
+    <AutoMuiDialog>
+      <DialogTitle>Confirmation</DialogTitle>
+      <DialogContent>
+        <Typography>{initialValues.message}</Typography>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={() => close()}>Cancel</Button>
+        <Button onClick={() => close({ message: "confirmed" })}>OK</Button>
       </DialogActions>
     </AutoMuiDialog>
   );
