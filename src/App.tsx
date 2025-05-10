@@ -92,8 +92,8 @@ function App() {
 
   return (
     <Container maxWidth="md">
-      <AppBar position="sticky">
-        <Toolbar variant="dense">
+      <Box>
+        <Toolbar variant="dense" className="app-toolbar">
           <IconButton
             size="small"
             edge="start"
@@ -115,7 +115,7 @@ function App() {
             Polymate
           </Typography>
         </Toolbar>
-      </AppBar>
+      </Box>
 
       <Menu
         id="preset-menu"
@@ -137,7 +137,7 @@ function App() {
         ))}
       </Menu>
 
-      <Grid container spacing={0}>
+      <Grid container spacing={0} sx={{ backgroundColor: "#f5f5f5" }}>
         <Grid item xs={6}>
           <PiecesManager
             pieces={pieces}
