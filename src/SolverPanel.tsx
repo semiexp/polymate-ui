@@ -383,7 +383,7 @@ export const SolverPanel = (props: SolverPanelProps) => {
             {actualIndex + 1} / {solvedProblem.numAnswers}
           </Typography>
         )}
-        {isRunning && <CircularProgress />}
+        {isRunning && <CircularProgress sx={{ marginLeft: 1 }} />}
       </Toolbar>
       <Box sx={{ height: "400px" }}>
         {solvedProblem !== null && solvedProblem.numAnswers === 0 && (
