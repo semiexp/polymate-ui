@@ -55,7 +55,7 @@ export const PiecesManager = (props: PiecesManagerProps) => {
 
   return (
     <Box className="toolbox">
-      <Toolbar variant="dense" sx={{ backgroundColor: "#ffdddd" }}>
+      <Toolbar variant="dense" className="pieces-toolbar">
         <Typography
           variant="h6"
           color="inherit"

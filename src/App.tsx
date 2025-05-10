@@ -116,7 +116,7 @@ function App() {
         </Grid>
         <Grid item xs={6}>
           <Box className="toolbox">
-            <Toolbar variant="dense" sx={{ backgroundColor: "#ffffcc" }}>
+            <Toolbar variant="dense" className="board-toolbar">
               <Typography variant="h6" color="inherit" component="div">
                 Board
               </Typography>

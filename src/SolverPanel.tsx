@@ -309,7 +309,7 @@ export const SolverPanel = (props: SolverPanelProps) => {
 
   return (
     <Box className="toolbox">
-      <Toolbar variant="dense" sx={{ backgroundColor: "#ddffff" }}>
+      <Toolbar variant="dense" className="solver-toolbar">
         <Typography variant="h6" color="inherit" component="div">
           Solver
         </Typography>
