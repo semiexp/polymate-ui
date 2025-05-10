@@ -1,4 +1,7 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
+import "./i18n/configs";
+
 import {
   Box,
   Grid,
@@ -13,6 +16,7 @@ import {
   DialogActions,
   DialogContent,
   TextField,
+  Select,
 } from "@mui/material";
 import { GridOn } from "@mui/icons-material";
 import AddBoxIcon from "@mui/icons-material/AddBox";
@@ -89,21 +93,27 @@ function App() {
     setShapeEditorGeneration(shapeEditorGeneration ^ 1);
   };
 
+  const { t, i18n } = useTranslation();
+
   return (
     <Container maxWidth="md">
       <Box>
         <Toolbar variant="dense" className="app-toolbar">
-          <IconButton
-            sx={{ ml: -2 }}
-            onClick={onNewProblem}
-          >
+          <IconButton sx={{ ml: -2 }} onClick={onNewProblem}>
             <AddBoxIcon />
           </IconButton>
-          <IconButton
-            onClick={handleOpenPresetMenu}
-          >
+          <IconButton onClick={handleOpenPresetMenu}>
             <LibraryBooksIcon />
           </IconButton>
+
+          <Select
+            value={i18n.language}
+            onChange={(e) => i18n.changeLanguage(e.target.value)}
+            sx={{ ml: "auto" }}
+          >
+            <MenuItem value="en">English</MenuItem>
+            <MenuItem value="ja">日本語</MenuItem>
+          </Select>
         </Toolbar>
       </Box>
 
@@ -138,7 +148,7 @@ function App() {
           <Box className="toolbox">
             <Toolbar variant="dense" className="board-toolbar">
               <Typography variant="h6" color="inherit" component="div">
-                Board
+                {t("board")}
               </Typography>
               <IconButton
                 size="small"
@@ -187,13 +197,15 @@ const PieceEditorDialog = (props: {
       setValues({ ...values, [key]: n });
     };
 
+  const { t } = useTranslation();
+
   return (
     <AutoMuiDialog>
-      <DialogTitle>New board</DialogTitle>
+      <DialogTitle>{t("newBoard.title")}</DialogTitle>
       <DialogContent>
         <Box sx={{ display: "grid", gridTemplateColumns: "1fr", gap: 2 }}>
           <TextField
-            label="Width"
+            label={t("newBoard.width")}
             type="number"
             InputLabelProps={{ shrink: true }}
             sx={{ mt: 2 }}
@@ -204,7 +216,7 @@ const PieceEditorDialog = (props: {
           />
 
           <TextField
-            label="Height"
+            label={t("newBoard.height")}
             type="number"
             InputLabelProps={{ shrink: true }}
             sx={{ mt: 2 }}
@@ -215,7 +227,7 @@ const PieceEditorDialog = (props: {
           />
 
           <TextField
-            label="Depth"
+            label={t("newBoard.depth")}
             type="number"
             InputLabelProps={{ shrink: true }}
             sx={{ mt: 2 }}
@@ -227,8 +239,8 @@ const PieceEditorDialog = (props: {
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => close()}>Cancel</Button>
-        <Button onClick={() => close(values)}>OK</Button>
+        <Button onClick={() => close()}>{t("cancel")}</Button>
+        <Button onClick={() => close(values)}>{t("ok")}</Button>
       </DialogActions>
     </AutoMuiDialog>
   );
@@ -238,13 +250,14 @@ const ConfirmationDialog = (props: {
   initialValues: { message: string };
   close: (values?: { message: string } | undefined) => void;
 }) => {
-  const { initialValues, close } = props;
+  const { close } = props;
+  const { t } = useTranslation();
 
   return (
     <AutoMuiDialog>
-      <DialogTitle>Confirmation</DialogTitle>
+      <DialogTitle>{t("confirmation")}</DialogTitle>
       <DialogContent>
-        <Typography>{initialValues.message}</Typography>
+        <Typography>{t("resetConfirmation")}</Typography>
       </DialogContent>
       <DialogActions>
         <Button onClick={() => close()}>Cancel</Button>

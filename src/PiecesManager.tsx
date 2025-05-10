@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { Add } from "@mui/icons-material";
 import {
@@ -53,6 +54,8 @@ export const PiecesManager = (props: PiecesManagerProps) => {
     onChange(pieces.filter((_piece, i) => i !== index));
   };
 
+  const { t } = useTranslation();
+
   return (
     <Box className="toolbox">
       <Toolbar variant="dense" className="pieces-toolbar">
@@ -62,7 +65,7 @@ export const PiecesManager = (props: PiecesManagerProps) => {
           component="div"
           sx={{ flexGlow: 1 }}
         >
-          Pieces
+          {t("pieces")}
         </Typography>
         <IconButton
           size="small"
@@ -150,9 +153,11 @@ const PieceEditorDialog = (props: {
     setValues({ ...values, count: n });
   };
 
+  const { t } = useTranslation();
+
   return (
     <AutoMuiDialog>
-      <DialogTitle>Edit Piece</DialogTitle>
+      <DialogTitle>{t("editPiece")}</DialogTitle>
       <DialogContent>
         <Box sx={{ height: "320px" }}>
           <ShapeEditor
@@ -162,10 +167,10 @@ const PieceEditorDialog = (props: {
           />
         </Box>
         {isEmptyError && (
-          <Typography color="error">Piece must not be empty</Typography>
+          <Typography color="error">{t("pieceEmpty")}</Typography>
         )}
         <TextField
-          label="Piece count"
+          label={t("pieceCount")}
           type="number"
           InputLabelProps={{ shrink: true }}
           sx={{ mt: 2 }}
@@ -176,7 +181,7 @@ const PieceEditorDialog = (props: {
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => close()}>Cancel</Button>
+        <Button onClick={() => close()}>{t("cancel")}</Button>
         <Button
           onClick={() => {
             if (isEmpty(values.shape)) {
@@ -190,7 +195,7 @@ const PieceEditorDialog = (props: {
             close(ret);
           }}
         >
-          OK
+          {t("ok")}
         </Button>
       </DialogActions>
     </AutoMuiDialog>

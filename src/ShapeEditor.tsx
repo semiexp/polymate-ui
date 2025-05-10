@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
+
 import { Box, Tab, Tabs } from "@mui/material";
 
 import { PlanarShapeEditor } from "./planarShapeEditor";
@@ -42,6 +44,8 @@ export const ShapeEditor = (props: ShapeEditorProps) => {
   const { shape, onChange } = props;
   const [tabValue, setTabValue] = useState(shape.length === 1 ? 0 : 1);
 
+  const { t } = useTranslation();
+
   return (
     <Box
       sx={{
@@ -61,9 +65,9 @@ export const ShapeEditor = (props: ShapeEditorProps) => {
         }}
       >
         <Tabs value={tabValue} onChange={(_e, v) => setTabValue(v)}>
-          <Tab label="Planar" disabled={shape.length !== 1} />
-          <Tab label="Cubic" />
-          <Tab label="Layerwise" disabled />
+          <Tab label={t("editor.planar")} disabled={shape.length !== 1} />
+          <Tab label={t("editor.cubic")} />
+          <Tab label={t("editor.layerwise")} disabled />
         </Tabs>
       </Box>
       {tabValue === 0 && (

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { solveAsync, getAnswerAsync, terminateWorker, Answer } from "./Solver";
 import { DetailedPiece } from "./shape";
@@ -307,11 +308,13 @@ export const SolverPanel = (props: SolverPanelProps) => {
 
   const [tabValue, setTabValue] = useState(0);
 
+  const { t } = useTranslation();
+
   return (
     <Box className="toolbox">
       <Toolbar variant="dense" className="solver-toolbar">
         <Typography variant="h6" color="inherit" component="div">
-          Solver
+          {t("solver.title")}
         </Typography>
         <IconButton
           size="small"
@@ -380,7 +383,7 @@ export const SolverPanel = (props: SolverPanelProps) => {
       <Box sx={{ height: "400px" }}>
         {solvedProblem !== null && solvedProblem.numAnswers === 0 && (
           <Box>
-            <Typography color="error">No solution</Typography>
+            <Typography color="error">{t("solver.noSolution")}</Typography>
           </Box>
         )}
         {solvedProblem !== null && solvedProblem.numAnswers > 0 && (
@@ -402,8 +405,8 @@ export const SolverPanel = (props: SolverPanelProps) => {
               }}
             >
               <Tabs value={tabValue} onChange={(_e, v) => setTabValue(v)}>
-                <Tab label="Layerwise" />
-                <Tab label="Cubic" />
+                <Tab label={t("solver.layerwise")} />
+                <Tab label={t("solver.cubic")} />
               </Tabs>
             </Box>
             {tabValue === 0 && currentAnswer !== null && (

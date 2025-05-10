@@ -1,0 +1,28 @@
+{
+  "cancel": "キャンセル",
+  "ok": "OK",
+  "board": "盤面",
+  "newBoard": {
+    "title": "新しい盤面",
+    "width": "幅",
+    "height": "高さ",
+    "depth": "深さ"
+  },
+  "confirmation": "確認",
+  "resetConfirmation": "盤面をリセットしてもよろしいですか？この操作は元に戻せません。",
+  "solver": {
+    "title": "ソルバー",
+    "noSolution": "解がありません",
+    "cubic": "立体",
+    "layerwise": "層別"
+  },
+  "pieces": "ピース",
+  "editPiece": "ピースの編集",
+  "pieceEmpty": "ピースは空にはできません",
+  "pieceCount": "ピースの個数",
+  "editor": {
+    "planar": "平面",
+    "cubic": "立体",
+    "layerwise": "層別"
+  }
+}
