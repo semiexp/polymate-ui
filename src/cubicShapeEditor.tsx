@@ -131,6 +131,9 @@ export const CubicShapeEditor = (props: CubicShapeEditorProps) => {
     }
 
     if (isDeleteMode) {
+      if (cubes.length <= 1) {
+        return cubes;
+      }
       const ret = [...cubes];
       return ret.map((c) => {
         if (
@@ -158,6 +161,9 @@ export const CubicShapeEditor = (props: CubicShapeEditorProps) => {
     let updated;
 
     if (isDeleteMode) {
+      if (cubes.length <= 1) {
+        return;
+      }
       const { x, y, z } = pointed.cube;
       updated = updateShape(shape, x - offset.x, y - offset.y, z - offset.z, 0);
     } else {
