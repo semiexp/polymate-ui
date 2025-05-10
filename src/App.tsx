@@ -95,18 +95,12 @@ function App() {
       <Box>
         <Toolbar variant="dense" className="app-toolbar">
           <IconButton
-            size="small"
-            edge="start"
-            color="inherit"
             sx={{ ml: -2 }}
             onClick={onNewProblem}
           >
             <AddBoxIcon />
           </IconButton>
           <IconButton
-            size="small"
-            edge="start"
-            color="inherit"
             onClick={handleOpenPresetMenu}
           >
             <LibraryBooksIcon />
