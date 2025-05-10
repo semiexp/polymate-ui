@@ -5,7 +5,6 @@ import {
   IconButton,
   Menu,
   MenuItem,
-  AppBar,
   Container,
   Toolbar,
   Typography,
