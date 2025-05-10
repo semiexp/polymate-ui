@@ -1,30 +1,27 @@
-import { useState } from "react";
-
+import React, { useState } from "react";
 import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
   Box,
   Grid,
   IconButton,
   Menu,
   MenuItem,
+  AppBar,
+  Container,
+  Toolbar,
+  Typography,
+  Button,
   DialogTitle,
   DialogActions,
   DialogContent,
   TextField,
-  Button,
 } from "@mui/material";
-import { ExpandMore, GridOn, Menu as MenuIcon } from "@mui/icons-material";
-import AppBar from "@mui/material/AppBar";
-import Container from "@mui/material/Container";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
-
+import { GridOn } from "@mui/icons-material";
+import AddBoxIcon from "@mui/icons-material/AddBox";
+import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
+import { presets } from "./Presets";
 import { PiecesManager } from "./PiecesManager";
 import { ShapeEditor } from "./ShapeEditor";
 import { SolverPanel } from "./SolverPanel";
-import { presets } from "./Presets";
 import { openDialog, AutoMuiDialog } from "./dialog";
 import { DetailedPiece } from "./shape";
 import "./App.css";
@@ -40,11 +37,19 @@ function App() {
   const [shapeEditorGeneration, setShapeEditorGeneration] = useState(0);
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const handleOpenAppMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
   const handleCloseAppMenu = () => {
     setAnchorEl(null);
+  };
+
+  const [presetMenuAnchorEl, setPresetMenuAnchorEl] =
+    useState<null | HTMLElement>(null);
+
+  const handleOpenPresetMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setPresetMenuAnchorEl(event.currentTarget);
+  };
+
+  const handleClosePresetMenu = () => {
+    setPresetMenuAnchorEl(null);
   };
 
   const onNewProblem = () => {
@@ -93,19 +98,44 @@ function App() {
             size="small"
             edge="start"
             color="inherit"
-            sx={{ ml: -2, mr: 1 }}
-            aria-controls={anchorEl !== null ? "app-menu" : undefined}
-            aria-haspopup="true"
-            aria-expanded={anchorEl !== null ? "true" : undefined}
-            onClick={handleOpenAppMenu}
+            sx={{ ml: -2 }}
+            onClick={onNewProblem}
           >
-            <MenuIcon />
+            <AddBoxIcon />
+          </IconButton>
+          <IconButton
+            size="small"
+            edge="start"
+            color="inherit"
+            onClick={handleOpenPresetMenu}
+          >
+            <LibraryBooksIcon />
           </IconButton>
           <Typography variant="h6" color="inherit" component="div">
             Polymate
           </Typography>
         </Toolbar>
       </AppBar>
+
+      <Menu
+        id="preset-menu"
+        anchorEl={presetMenuAnchorEl}
+        open={presetMenuAnchorEl !== null}
+        onClose={handleClosePresetMenu}
+        MenuListProps={{ "aria-labelledby": "preset-menu" }}
+      >
+        {presets.map((preset, i) => (
+          <MenuItem
+            key={`${i}`}
+            onClick={() => {
+              onUsePreset(i);
+              handleClosePresetMenu();
+            }}
+          >
+            {preset.name}
+          </MenuItem>
+        ))}
+      </Menu>
 
       <Grid container spacing={0}>
         <Grid item xs={6}>
@@ -144,35 +174,6 @@ function App() {
           <SolverPanel pieces={pieces} board={board} />
         </Grid>
       </Grid>
-
-      <Menu
-        id="app-menu"
-        anchorEl={anchorEl}
-        open={anchorEl !== null}
-        onClose={handleCloseAppMenu}
-        MenuListProps={{ "aria-labelledby": "app-menu" }}
-      >
-        <MenuItem onClick={onNewProblem}>New Problem</MenuItem>
-        <Accordion
-          elevation={0}
-          sx={{ backgroundColor: "transparent" }}
-          disableGutters
-        >
-          <AccordionSummary
-            sx={{ padding: 0, minHeight: 0 }}
-            expandIcon={<ExpandMore />}
-          >
-            <MenuItem sx={{ margin: 0 }}>Load presets</MenuItem>
-          </AccordionSummary>
-          <AccordionDetails sx={{ pt: 0, pb: 0, margin: 0 }}>
-            {presets.map((preset, i) => (
-              <MenuItem key={`${i}`} onClick={() => onUsePreset(i)}>
-                {preset.name}
-              </MenuItem>
-            ))}
-          </AccordionDetails>
-        </Accordion>
-      </Menu>
     </Container>
   );
 }
