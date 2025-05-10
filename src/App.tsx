@@ -27,7 +27,7 @@ import { SolverPanel } from "./SolverPanel";
 import { presets } from "./Presets";
 import { openDialog, AutoMuiDialog } from "./dialog";
 import { DetailedPiece } from "./shape";
-// import "./App.css";
+import "./App.css";
 
 function App() {
   const [board, setBoard] = useState<number[][][]>([[[1]]]);
@@ -115,15 +115,7 @@ function App() {
           />
         </Grid>
         <Grid item xs={6}>
-          <Box
-            sx={{
-              border: 2,
-              borderColor: "#999999",
-              margin: 1,
-              borderRadius: 2,
-              overflow: "hidden",
-            }}
-          >
+          <Box className="toolbox">
             <Toolbar variant="dense" sx={{ backgroundColor: "#ffffcc" }}>
               <Typography variant="h6" color="inherit" component="div">
                 Board

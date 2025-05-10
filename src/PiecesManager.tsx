@@ -54,15 +54,7 @@ export const PiecesManager = (props: PiecesManagerProps) => {
   };
 
   return (
-    <Box
-      sx={{
-        border: 2,
-        borderColor: "#999999",
-        margin: 1,
-        borderRadius: 2,
-        overflow: "hidden",
-      }}
-    >
+    <Box className="toolbox">
       <Toolbar variant="dense" sx={{ backgroundColor: "#ffdddd" }}>
         <Typography
           variant="h6"
