@@ -36,11 +36,6 @@ function App() {
   ]);
   const [shapeEditorGeneration, setShapeEditorGeneration] = useState(0);
 
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const handleCloseAppMenu = () => {
-    setAnchorEl(null);
-  };
-
   const [presetMenuAnchorEl, setPresetMenuAnchorEl] =
     useState<null | HTMLElement>(null);
 
@@ -62,7 +57,6 @@ function App() {
       },
     ]);
     setShapeEditorGeneration(shapeEditorGeneration ^ 1);
-    setAnchorEl(null);
   };
   const onNewBoard = async () => {
     const newBoardShape = await openDialog(PieceEditorDialog, {
@@ -87,7 +81,6 @@ function App() {
     setBoard(presets[presetIdx].board);
     setPieces(presets[presetIdx].pieces);
     setShapeEditorGeneration(shapeEditorGeneration ^ 1);
-    setAnchorEl(null);
   };
 
   return (
