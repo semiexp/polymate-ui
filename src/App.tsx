@@ -87,7 +87,6 @@ function App() {
   };
 
   const onUsePreset = (presetIdx: number) => {
-    console.log(presets[presetIdx].board);
     setBoard(presets[presetIdx].board);
     setPieces(presets[presetIdx].pieces);
     setShapeEditorGeneration(shapeEditorGeneration ^ 1);
