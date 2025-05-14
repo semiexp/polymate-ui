@@ -33,5 +33,31 @@
   "loadSample": "サンプルを読み込む",
   "addPiece": "ピースを追加",
   "runSolver": "ソルバーを実行",
-  "stopSolver": "停止"
+  "stopSolver": "停止",
+  "help": {
+    "shapeEditor": {
+      "title": "形状（ピース、盤面）の編集",
+      "planar": {
+        "title": "平面",
+        "content1": "左クリック: セルの有無の切り替え",
+        "content2": "右ドラッグ: 表示領域の移動",
+        "content3": "ホイール: ズームイン/ズームアウト"
+      },
+      "cubic": {
+        "title": "立体",
+        "content1": "左クリック: セルの追加",
+        "content2": "Ctrl + 左クリック: セルの削除",
+        "content3": "右ドラッグ: 回転",
+        "content4": "ホイール: ズームイン/ズームアウト",
+        "content5": "ホイールドラッグ: 表示領域の移動"
+      }
+    },
+    "disclaimer": {
+      "title": "免責事項",
+      "content": "このツールを使用することによって生じたいかなる問題についても、作者は責任を負わないものとします。"
+    },
+    "licenses": "ライセンス",
+    "title": "ヘルプ",
+    "close": "閉じる"
+  }
 }

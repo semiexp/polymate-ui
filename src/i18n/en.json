@@ -33,5 +33,31 @@
   "loadSample": "Load sample puzzle",
   "addPiece": "Add piece",
   "runSolver": "Run Solver",
-  "stopSolver": "Stop Solver"
+  "stopSolver": "Stop Solver",
+  "help": {
+    "shapeEditor": {
+      "title": "Edit shapes (pieces, board)",
+      "planar": {
+        "title": "Planar",
+        "content1": "Left click: Toggle cell presence",
+        "content2": "Right drag: Move view area",
+        "content3": "Wheel: Zoom in/out"
+      },
+      "cubic": {
+        "title": "Cubic",
+        "content1": "Left click: Add cell",
+        "content2": "Ctrl + Left click: Remove cell",
+        "content3": "Right drag: Rotate",
+        "content4": "Wheel: Zoom in/out",
+        "content5": "Wheel drag: Move view area"
+      }
+    },
+    "disclaimer": {
+      "title": "Disclaimer",
+      "content": "The author shall not be liable for any problem caused by using this tool."
+    },
+    "licenses": "Licenses",
+    "title": "Help",
+    "close": "Close"
+  }
 }

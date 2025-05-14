@@ -20,6 +20,7 @@ import {
 import { GridOn } from "@mui/icons-material";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
+import HelpIcon from "@mui/icons-material/Help";
 import { presets } from "./Presets";
 import { PiecesManager } from "./PiecesManager";
 import { ShapeEditor } from "./ShapeEditor";
@@ -28,6 +29,7 @@ import { openDialog, AutoMuiDialog } from "./dialog";
 import { DetailedPiece } from "./shape";
 import "./App.css";
 import { TooltipButton } from "./components/tooltipButton";
+import { HelpDialog } from "./helpDialog";
 
 function App() {
   const [board, setBoard] = useState<number[][][]>([[[1]]]);
@@ -109,10 +111,16 @@ function App() {
             <LibraryBooksIcon />
           </TooltipButton>
 
+          <TooltipButton
+            title={t("help.title")}
+            onClick={() => openDialog(HelpDialog, {})}
+            sx={{ ml: "auto" }}
+          >
+            <HelpIcon />
+          </TooltipButton>
           <Select
             value={i18n.language}
             onChange={(e) => i18n.changeLanguage(e.target.value)}
-            sx={{ ml: "auto" }}
           >
             <MenuItem value="en">English</MenuItem>
             <MenuItem value="ja">日本語</MenuItem>
