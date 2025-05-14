@@ -15,12 +15,12 @@ import {
 import {
   Box,
   CircularProgress,
-  IconButton,
   Tab,
   Tabs,
   Toolbar,
   Typography,
 } from "@mui/material";
+import { TooltipButton } from "./components/tooltipButton";
 
 const getColor = (id: number, selected: boolean, translucent?: boolean) => {
   const alpha = translucent ? 0.3 : 1.0;
@@ -316,7 +316,8 @@ export const SolverPanel = (props: SolverPanelProps) => {
         <Typography variant="h6" color="inherit" component="div">
           {t("solver.title")}
         </Typography>
-        <IconButton
+        <TooltipButton
+          title={isRunning ? t("stopSolver") : t("runSolver")}
           size="small"
           edge="start"
           color="inherit"
@@ -324,8 +325,9 @@ export const SolverPanel = (props: SolverPanelProps) => {
           onClick={onSolve}
         >
           {isRunning ? <Cancel /> : <Search />}
-        </IconButton>
-        <IconButton
+        </TooltipButton>
+        <TooltipButton
+          title={t("solver.firstAnswer")}
           size="small"
           edge="start"
           color="inherit"
@@ -335,8 +337,9 @@ export const SolverPanel = (props: SolverPanelProps) => {
           onClick={async () => await updateIndex(-2)}
         >
           <KeyboardDoubleArrowLeft />
-        </IconButton>
-        <IconButton
+        </TooltipButton>
+        <TooltipButton
+          title={t("solver.prevAnswer")}
           size="small"
           edge="start"
           color="inherit"
@@ -346,8 +349,9 @@ export const SolverPanel = (props: SolverPanelProps) => {
           onClick={async () => await updateIndex(-1)}
         >
           <KeyboardArrowLeft />
-        </IconButton>
-        <IconButton
+        </TooltipButton>
+        <TooltipButton
+          title={t("solver.nextAnswer")}
           size="small"
           edge="start"
           color="inherit"
@@ -359,8 +363,9 @@ export const SolverPanel = (props: SolverPanelProps) => {
           onClick={async () => await updateIndex(1)}
         >
           <KeyboardArrowRight />
-        </IconButton>
-        <IconButton
+        </TooltipButton>
+        <TooltipButton
+          title={t("solver.lastAnswer")}
           size="small"
           edge="start"
           color="inherit"
@@ -372,7 +377,7 @@ export const SolverPanel = (props: SolverPanelProps) => {
           onClick={async () => await updateIndex(2)}
         >
           <KeyboardDoubleArrowRight />
-        </IconButton>
+        </TooltipButton>
         {solvedProblem !== null && (
           <Typography color="inherit" sx={{ marginLeft: 1 }}>
             {actualIndex + 1} / {solvedProblem.numAnswers}

@@ -14,7 +14,11 @@
     "title": "ソルバー",
     "noSolution": "解がありません",
     "cubic": "立体",
-    "layerwise": "層別"
+    "layerwise": "層別",
+    "firstAnswer": "最初の解答",
+    "prevAnswer": "前の解答",
+    "nextAnswer": "次の解答",
+    "lastAnswer": "最後の解答"
   },
   "pieces": "ピース",
   "editPiece": "ピースの編集",
@@ -24,5 +28,10 @@
     "planar": "平面",
     "cubic": "立体",
     "layerwise": "層別"
-  }
+  },
+  "newPuzzle": "新規作成",
+  "loadSample": "サンプルを読み込む",
+  "addPiece": "ピースを追加",
+  "runSolver": "ソルバーを実行",
+  "stopSolver": "停止"
 }

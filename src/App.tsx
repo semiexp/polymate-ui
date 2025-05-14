@@ -5,7 +5,6 @@ import "./i18n/configs";
 import {
   Box,
   Grid,
-  IconButton,
   Menu,
   MenuItem,
   Container,
@@ -28,6 +27,7 @@ import { SolverPanel } from "./SolverPanel";
 import { openDialog, AutoMuiDialog } from "./dialog";
 import { DetailedPiece } from "./shape";
 import "./App.css";
+import { TooltipButton } from "./components/tooltipButton";
 
 function App() {
   const [board, setBoard] = useState<number[][][]>([[[1]]]);
@@ -98,12 +98,16 @@ function App() {
     <Container maxWidth="md">
       <Box>
         <Toolbar variant="dense" className="app-toolbar">
-          <IconButton sx={{ ml: -2 }} onClick={onNewProblem}>
+          <TooltipButton
+            title={t("newPuzzle")}
+            sx={{ ml: -2 }}
+            onClick={onNewProblem}
+          >
             <AddBoxIcon />
-          </IconButton>
-          <IconButton onClick={handleOpenPresetMenu}>
+          </TooltipButton>
+          <TooltipButton title={t("loadSample")} onClick={handleOpenPresetMenu}>
             <LibraryBooksIcon />
-          </IconButton>
+          </TooltipButton>
 
           <Select
             value={i18n.language}
@@ -149,7 +153,8 @@ function App() {
               <Typography variant="h6" color="inherit" component="div">
                 {t("board")}
               </Typography>
-              <IconButton
+              <TooltipButton
+                title={t("newBoard.title")}
                 size="small"
                 edge="start"
                 color="inherit"
@@ -157,7 +162,7 @@ function App() {
                 onClick={onNewBoard}
               >
                 <GridOn />
-              </IconButton>
+              </TooltipButton>
             </Toolbar>
             <Box sx={{ height: "320px" }}>
               <ShapeEditor

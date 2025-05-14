@@ -14,7 +14,11 @@
     "title": "Solver",
     "noSolution": "No solution",
     "cubic": "Cubic",
-    "layerwise": "Layerwise"
+    "layerwise": "Layerwise",
+    "firstAnswer": "First answer",
+    "prevAnswer": "Previous answer",
+    "nextAnswer": "Next answer",
+    "lastAnswer": "Last answer"
   },
   "pieces": "Pieces",
   "editPiece": "Edit Piece",
@@ -24,5 +28,10 @@
     "planar": "Planar",
     "cubic": "Cubic",
     "layerwise": "Layerwise"
-  }
+  },
+  "newPuzzle": "New Puzzle",
+  "loadSample": "Load sample puzzle",
+  "addPiece": "Add piece",
+  "runSolver": "Run Solver",
+  "stopSolver": "Stop Solver"
 }

@@ -7,7 +7,6 @@ import {
   Grid,
   Toolbar,
   Typography,
-  IconButton,
   Button,
   DialogTitle,
   DialogActions,
@@ -20,6 +19,7 @@ import { ShapeEditor } from "./ShapeEditor";
 import { DetailedPiece, isEmpty } from "./shape";
 
 import { openDialog, AutoMuiDialog } from "./dialog";
+import { TooltipButton } from "./components/tooltipButton";
 
 export type PiecesManagerProps = {
   pieces: DetailedPiece[];
@@ -67,7 +67,8 @@ export const PiecesManager = (props: PiecesManagerProps) => {
         >
           {t("pieces")}
         </Typography>
-        <IconButton
+        <TooltipButton
+          title={t("addPiece")}
           size="small"
           edge="start"
           color="inherit"
@@ -75,7 +76,7 @@ export const PiecesManager = (props: PiecesManagerProps) => {
           onClick={onAddPiece}
         >
           <Add />
-        </IconButton>
+        </TooltipButton>
       </Toolbar>
       <Box sx={{ overflowY: "scroll", height: "320px" }}>
         <Grid container spacing={0}>
