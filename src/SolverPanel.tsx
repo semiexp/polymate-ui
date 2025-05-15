@@ -249,6 +249,9 @@ export const SolverPanel = (props: SolverPanelProps) => {
   const [currentAnswer, setCurrentAnswer] = useState<Answer | null>(null);
 
   const setIndexAndLoadAnswer = async (index: number) => {
+    if (solvedProblem === null || index >= solvedProblem.numAnswers) {
+      return;
+    }
     const ans = await getAnswerAsync(index);
     if (ans === null) {
       return;
